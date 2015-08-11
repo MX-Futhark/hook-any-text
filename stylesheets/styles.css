@@ -143,6 +143,13 @@ strong {
   font-weight:700;
 }
 
+header ul li#download-link {
+  text-align:center;
+  width:100%;
+  border-left:none;
+  border-right:none;
+}
+
 header ul li + li {
   width:88px;
   border-left:1px solid #fff;
@@ -216,6 +223,11 @@ footer {
     right:50px;
     top:52px;
   }
+}
+
+#logo {
+  float:left;
+  margin-right:20px;
 }
 
 @media print, screen and (max-width: 720px) {
