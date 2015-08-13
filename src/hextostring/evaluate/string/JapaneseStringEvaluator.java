@@ -42,8 +42,10 @@ public class JapaneseStringEvaluator extends ReadableStringEvaluator {
 	}
 
 	private boolean hasPunctuation(String s) {
+		if (s.length() == 0) return false;
+
 		String lastChar = s.substring(s.length() - 1);
-		for(String punctuation : japanesePunctuation) {
+		for (String punctuation : japanesePunctuation) {
 			if (lastChar.matches(punctuation)) {
 				return true;
 			}
