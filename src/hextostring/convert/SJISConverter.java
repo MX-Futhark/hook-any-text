@@ -1,6 +1,5 @@
 package hextostring.convert;
 
-import hextostring.evaluate.EvaluatorFactory;
 import hextostring.utils.Charsets;
 
 import java.util.LinkedList;
@@ -16,10 +15,7 @@ import java.util.regex.Pattern;
 public class SJISConverter extends Converter {
 
 	public SJISConverter() {
-		super(
-			Charsets.SHIFT_JIS,
-			EvaluatorFactory.getHexStringEvaluatorInstance(Charsets.SHIFT_JIS)
-		);
+		super(Charsets.SHIFT_JIS);
 	}
 
 	@Override

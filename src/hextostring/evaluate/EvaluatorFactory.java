@@ -33,7 +33,7 @@ public class EvaluatorFactory {
 	public static HexStringEvaluator getHexStringEvaluatorInstance(Charset cs) {
 		if (cs == Charsets.SHIFT_JIS) {
 			return sjisHexStringEvaluatorInstance;
-		} else if (cs == Charsets.UTF16) {
+		} else if (cs == Charsets.UTF16_BE || cs == Charsets.UTF16_LE) {
 			return utf16HexStringEvaluatorInstance;
 		}
 		throw new IllegalArgumentException("Invalid charset: " + cs.name());

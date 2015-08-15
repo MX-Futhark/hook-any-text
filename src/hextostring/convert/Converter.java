@@ -22,9 +22,10 @@ public abstract class Converter {
 	private HexStringEvaluator hexStringEvaluator;
 	private ReadableStringEvaluator japaneseStringEvaluator;
 
-	public Converter(Charset charset, HexStringEvaluator hexStringEvaluator) {
+	public Converter(Charset charset) {
 		this.charset = charset;
-		this.hexStringEvaluator = hexStringEvaluator;
+		this.hexStringEvaluator =
+			EvaluatorFactory.getHexStringEvaluatorInstance(charset);
 		this.japaneseStringEvaluator =
 			EvaluatorFactory.getReadableStringEvaluatorInstance();
 	}
@@ -79,7 +80,6 @@ public abstract class Converter {
 		for (Byte b : data) {
 			arrayData[cmpt++] = b;
 		}
-
 		return byteArrayToString(arrayData);
 	}
 

@@ -12,7 +12,10 @@ import java.nio.charset.Charset;
 public class ConverterFactory {
 
 	private static SJISConverter sjisConverterInstance = new SJISConverter();
-	private static UTF16Converter utf16ConverterInstance = new UTF16Converter();
+	private static UTF16Converter utf16BEConverterInstance =
+		new UTF16Converter(true);
+	private static UTF16Converter utf16LEConverterInstance =
+		new UTF16Converter(false);
 
 	/**
 	 * Provides a converter for a given charset.
@@ -24,8 +27,10 @@ public class ConverterFactory {
 	public static Converter getConverterInstance(Charset charset) {
 		if (charset.equals(Charsets.SHIFT_JIS)) {
 			return sjisConverterInstance;
-		} else if (charset.equals(Charsets.UTF16)) {
-			return utf16ConverterInstance;
+		} else if (charset.equals(Charsets.UTF16_BE)) {
+			return utf16BEConverterInstance;
+		} else if (charset.equals(Charsets.UTF16_LE)) {
+			return utf16LEConverterInstance;
 		} else {
 			throw new IllegalArgumentException("Invalid charset in options.");
 		}

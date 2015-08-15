@@ -5,14 +5,4 @@ package hextostring.evaluate.hex;
  *
  * @author Maxime PIA
  */
-public  class UTF16HexStringEvaluator extends HexStringEvaluator {
-
-	@Override
-	public int evaluate(String s) {
-		// TODO
-		throw new UnsupportedOperationException(
-			"UTF-16 has yet to be supported."
-		);
-	}
-
-}
+public class UTF16HexStringEvaluator extends HexStringEvaluator {}

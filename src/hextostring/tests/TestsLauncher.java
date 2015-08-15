@@ -28,6 +28,7 @@ import java.util.Arrays;
  *
  *   tests
  *   |-sjis (contains tests for games using Shift JIS)
+ *   | |-handmade (contains tests crafted without relying on a game)
  *   | |-[game1]
  *   | | |-input
  *   | | | |-0001.txt
@@ -39,17 +40,19 @@ import java.util.Arrays;
  *   | |   |-...
  *   | |-[game2]
  *   | |-...
- *   |-utf16  (contains tests for games using UTF-16)
- *     |-[gameA]
- *     | |-input
- *     | | |-0001.txt
- *     | | |-0002.txt
- *     | | |-...
- *     | |-expected_output
- *     |   |-0001.txt
- *     |   |-0002.txt
- *     |   |-...
- *     |-[gameB]
+ *   |-utf16-be  (contains tests for games using UTF-16 Big Endian)
+ *   | |-[gameA]
+ *   | | |-input
+ *   | | | |-0001.txt
+ *   | | | |-0002.txt
+ *   | | | |-...
+ *   | | |-expected_output
+ *   | |   |-0001.txt
+ *   | |   |-0002.txt
+ *   | |   |-...
+ *   | |-[gameB]
+ *   | |-...
+ *   |-utf16-le  (contains tests for games using UTF-16 Little Endian)
  *     |-...
  *
  * It is assumed that all .txt files are encoded in UTF-8, without the BOM.
@@ -115,9 +118,12 @@ public class TestsLauncher {
 		if (f.getName().equals("sjis")) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS);
-		} else if (f.getName().equals("utf16")) {
+		} else if (f.getName().equals("utf16-be")) {
 			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF16);
+				ConverterFactory.getConverterInstance(Charsets.UTF16_BE);
+		} else if (f.getName().equals("utf16-le")) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.UTF16_LE);
 		}
 
 		if (f.isDirectory()) {

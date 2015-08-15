@@ -49,8 +49,11 @@ public class Options {
 			} else if (arg.equals("-sjis")) {
 				charset = Charsets.SHIFT_JIS;
 				++charsetSet;
-			} else if (arg.equals("-utf16")) {
-				charset = Charsets.UTF16;
+			} else if (arg.equals("-utf16-le")) {
+				charset = Charsets.UTF16_LE;
+				++charsetSet;
+			} else if (arg.equals("-utf16-be")) {
+				charset = Charsets.UTF16_BE;
 				++charsetSet;
 			} else {
 				throw new IllegalArgumentException("Invalid Argument: " + arg);
@@ -85,11 +88,16 @@ public class Options {
 		);
 		usage.append(
 			"\n\t-sjis\tTo interpret the input as Shift JIS " +
-			"(default if no encoding flag set, incompatible with -utf16)"
+			"(default if no encoding flag set, incompatible with other " +
+			"encoding flags)"
 		);
 		usage.append(
-			"\n\t-utf16\tTo interpret the input as UTF-16 " +
-			"(optional, incompatible with -sjis)"
+			"\n\t-utf16-be\tTo interpret the input as UTF-16 Big Endian" +
+			"(optional, incompatible with other encoding flags)"
+		);
+		usage.append(
+			"\n\t-utf16-le\tTo interpret the input as UTF-16 Little Endian" +
+			"(optional, incompatible with other encoding flags)"
 		);
 		return usage.toString();
 	}

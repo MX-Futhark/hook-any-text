@@ -60,6 +60,7 @@ Test files are put into the tests directory. Its architecture is as follows:
 
         tests
         |-sjis (contains tests for games using Shift JIS)
+        | |-handmade (contains tests crafted without relying on a game)
         | |-[game1]
         | | |-input
         | | | |-0001.txt
