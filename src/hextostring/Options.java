@@ -55,6 +55,9 @@ public class Options {
 			} else if (arg.equals("-utf16-be")) {
 				charset = Charsets.UTF16_BE;
 				++charsetSet;
+			} else if (arg.equals("-utf8")) {
+				charset = Charsets.UTF8;
+				++charsetSet;
 			} else {
 				throw new IllegalArgumentException("Invalid Argument: " + arg);
 			}
@@ -92,12 +95,17 @@ public class Options {
 			"encoding flags)"
 		);
 		usage.append(
-			"\n\t-utf16-be\tTo interpret the input as UTF-16 Big Endian" +
+			"\n\t-utf16-be\tTo interpret the input as UTF-16 Big Endian " +
 			"(optional, incompatible with other encoding flags)"
 		);
 		usage.append(
-			"\n\t-utf16-le\tTo interpret the input as UTF-16 Little Endian" +
+			"\n\t-utf16-le\tTo interpret the input as UTF-16 Little Endian " +
 			"(optional, incompatible with other encoding flags)"
+		);
+		usage.append(
+			"\n\t-utf8\tTo interpret the input as UTF-8 " +
+			"(default if no encoding flag set, incompatible with other " +
+			"encoding flags)"
 		);
 		return usage.toString();
 	}

@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 0.3.0 - 2015-15-08
+- Added support for games using UTF-8.
+
 ## 0.2.0 - 2015-15-08
 - Added support for games using UTF-16 Big Endian.
 - Added support for games using UTF-16 Little Endian.

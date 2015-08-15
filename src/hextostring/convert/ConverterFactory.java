@@ -16,6 +16,7 @@ public class ConverterFactory {
 		new UTF16Converter(true);
 	private static UTF16Converter utf16LEConverterInstance =
 		new UTF16Converter(false);
+	private static UTF8Converter utf8ConverterInstance = new UTF8Converter();
 
 	/**
 	 * Provides a converter for a given charset.
@@ -31,6 +32,8 @@ public class ConverterFactory {
 			return utf16BEConverterInstance;
 		} else if (charset.equals(Charsets.UTF16_LE)) {
 			return utf16LEConverterInstance;
+		} else if (charset.equals(Charsets.UTF8)) {
+			return utf8ConverterInstance;
 		} else {
 			throw new IllegalArgumentException("Invalid charset in options.");
 		}

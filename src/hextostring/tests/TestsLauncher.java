@@ -53,6 +53,8 @@ import java.util.Arrays;
  *   | |-[gameB]
  *   | |-...
  *   |-utf16-le  (contains tests for games using UTF-16 Little Endian)
+ *   | |-...
+ *   |-utf8  (contains tests for games using UTF-8)
  *     |-...
  *
  * It is assumed that all .txt files are encoded in UTF-8, without the BOM.
@@ -124,6 +126,9 @@ public class TestsLauncher {
 		} else if (f.getName().equals("utf16-le")) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.UTF16_LE);
+		} else if (f.getName().equals("utf8")) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.UTF8);
 		}
 
 		if (f.isDirectory()) {
