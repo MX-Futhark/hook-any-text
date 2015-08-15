@@ -3,7 +3,7 @@
 HAT is a plugin for Cheat Engine that automatically converts hexadecimal data into readable strings.
 This project aims at providing a way to hook text when other widely used text hookers fail to do so.
 Therefore, it might not be as user-friendly as what is expected of such tools, and the result might not be as clean as you would expect.
-However, you WILL be able to hook the text of any game, even on emulators.
+However, you should be able to hook the text of a vast range of games, particularly on emulators.
 
 
 ## You are a user
@@ -26,8 +26,7 @@ Changes in the selected zone cause the hexadecimal data to be piped into a proce
 
 ### General organization
 
-The Lua file (automatically run when Cheat Engine is started) is placed in the lua directory.
-
+The Lua file (automatically run when Cheat Engine is started) is placed in the lua directory.  
 The actual conversion of hexadecimal strings is done in Java, and goes into the src directory.
 
 The conversion is not done directly in lua because:
@@ -51,8 +50,7 @@ The hooking and conversion process can be summarized by the following steps:
 
 ### Tests
 
-A test consists of an input and a corresponding expected, manually written output.
-
+A test consists of an input and a corresponding expected, manually written output.  
 Every input file is converted and compared to the expected output.
 
 
