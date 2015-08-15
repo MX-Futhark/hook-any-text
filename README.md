@@ -18,6 +18,13 @@ Once this is done, read LICENSE (TL;DR: MIT License. If you're going to use stuf
 Then, here are some more stuff for you:
 
 
+### Build intructions
+
+I recommend Eclipse or Netbeans to use with this project.  
+The entry point of the main program is hextostring.Main. Change command line options as necessary in your run configurations.  
+The entry point of the test program is hextostring.tests.TestLauncher. Command line options will not be taken into account.
+
+
 ### How it works
 
 selectionConverter.lua is run when Cheat Engine starts. The hooking occurs when a zone in the memory is selected.
