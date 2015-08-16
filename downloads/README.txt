@@ -114,6 +114,9 @@
   Changelog
   ---------
 
+  0.1.1 - 2015-13-08
+   - Fixed bug raising an exception due to empty strings.
+
   0.1.0 - 2015-08-12
    - Added support for games using Shift-JIS.
    - Added debug mode.
