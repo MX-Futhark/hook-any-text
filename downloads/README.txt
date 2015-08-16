@@ -40,12 +40,6 @@
   The instructions below assume a certain level of ease with
   Cheat Engine. For more detailed instructions, please visit the wiki
   of the project at https://github.com/MX-Futhark/hook-any-text/wiki.
-  
-  0. If the game you are going to play is not encoded in Shift JIS,
-     open selectionConverter.lua with a text editor in administrator
-     mode, search the text "-sjis", and replace it with either "-utf8"
-     "-utf16-be" or "-utf16-le" depending on the encoding of your game
-     and the way your emulator (if you use one) handle endianness.
 
   1. Open the game.
 
@@ -119,10 +113,15 @@
 
   Changelog
   ---------
-  
+
+  0.4.0 - 2015-16-08
+   - Added encoding recognition.
+   - Set default encoding to auto-recognized.
+   - Improved Japanese recognition.
+
   0.3.0 - 2015-15-08
    - Added support for games using UTF-8.
-  
+
   0.2.0 - 2015-15-08
    - Added support for games using UTF-16 Big Endian.
    - Added support for games using UTF-16 Little Endian.
