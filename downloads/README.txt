@@ -43,7 +43,7 @@
   
   0. If the game you are going to play is not encoded in Shift JIS,
      open selectionConverter.lua with a text editor in administrator
-     mode, search the text "-sjis", and replace it with either
+     mode, search the text "-sjis", and replace it with either "-utf8"
      "-utf16-be" or "-utf16-le" depending on the encoding of your game
      and the way your emulator (if you use one) handle endianness.
 
@@ -119,6 +119,9 @@
 
   Changelog
   ---------
+  
+  0.3.0 - 2015-15-08
+   - Added support for games using UTF-8.
   
   0.2.0 - 2015-15-08
    - Added support for games using UTF-16 Big Endian.
