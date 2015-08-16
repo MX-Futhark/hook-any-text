@@ -23,6 +23,26 @@ public abstract class Converter {
 	private ReadableStringEvaluator japaneseStringEvaluator;
 
 	public Converter(Charset charset) {
+		setCharset(charset);
+	}
+
+	/**
+	 * Getter on the charset used by the converter.
+	 *
+	 * @param charset
+	 * 			The charset used by the converter.
+	 */
+	protected Charset getCharset() {
+		return charset;
+	}
+
+	/**
+	 * Sets the charset for the converter and adapts its evaluators accordingly.
+	 *
+	 * @param charset
+	 * 			The new charset for this converter.
+	 */
+	protected void setCharset(Charset charset) {
 		this.charset = charset;
 		this.hexStringEvaluator =
 			EvaluatorFactory.getHexStringEvaluatorInstance(charset);
@@ -110,10 +130,11 @@ public abstract class Converter {
 	 * @return
 	 */
 	public DebuggableLineList convert(String hex) {
-		DebuggableLineList lines = new DebuggableLineList(preProcessHex(hex));
+		DebuggableLineList lines =
+			new DebuggableLineList(preProcessHex(hex), charset);
 		List<String> hexCollection = extractConvertibleChunks(lines.getHexInput());
 		for (String hexChunk : hexCollection) {
-			DebuggableLine line = new DebuggableLine(hexChunk);
+			DebuggableLine line = new DebuggableLine(hexChunk, charset);
 			line.setHexValidity(hexStringEvaluator.evaluate(hexChunk));
 			line.setReadableString(
 				byteListToString(

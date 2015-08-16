@@ -1,10 +1,21 @@
+
+
 function updateClipboard(threadObj)
+
+    -- ENCODING among -detect-enc, -sjis, -utf16-be, -utf16-le, -utf8
+    local ENCODING = "-detect-enc"
+    -- 0 <= DEBUG_LEVEL <= 5
+    local DEBUG_LEVEL = 0
+    -- any positive or negative integer
+    local STRICTNESS = 20
+
 
 	local hexView = getMemoryViewForm().HexadecimalView
 	local previousBytes = {}
 	local handle = io.popen(
         "java.exe -jar \"" .. getCheatEngineDir() ..
-        "autorun\\HexToString.jar\" -sjis",
+        "autorun\\HexToString.jar\" " ..
+        ENCODING .. " -d=" .. DEBUG_LEVEL .. " -s=" .. STRICTNESS,
         "w"
     )
 	local selectionSize = 0

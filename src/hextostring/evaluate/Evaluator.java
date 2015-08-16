@@ -2,20 +2,20 @@ package hextostring.evaluate;
 
 /**
  * Interface for evaluators.
- * Evaluators provide a way to give a mark to a string to determine whether
+ * Evaluators provide a way to give a mark to an object to determine whether
  * it is worth considering in the final output or not.
  *
  * @author Maxime PIA
  */
-public interface Evaluator {
+public interface Evaluator<O> {
 
 	/**
 	 * Provides a validity mark for a string.
 	 *
-	 * @param s
-	 * 			The string to evaluate.
-	 * @return A validity mark for the string in parameter.
+	 * @param o
+	 * 			The object to evaluate.
+	 * @return A validity mark for the object in parameter.
 	 */
-	int evaluate(String s);
+	int evaluate(O o);
 
 }

@@ -62,6 +62,9 @@ public class HexProcessor {
 
 				// avoid unnecessarily updating the clipboard
 				if (!result.equals(previousResult)) {
+					if(opts.getDebugLevel() > 0) {
+						print(result, out);
+					}
 					Clipboard.set(result);
 					previousResult = result;
 				}

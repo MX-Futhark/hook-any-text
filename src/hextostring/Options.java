@@ -13,7 +13,7 @@ public class Options {
 
 	public static final int DEFAULT_DEBUG_LEVEL = 0;
 	public static final int DEFAULT_STRICTNESS = 20;
-	public static final Charset DEFAULT_CHARSET = Charsets.SHIFT_JIS;
+	public static final Charset DEFAULT_CHARSET = Charsets.DETECT;
 
 	private int strictness = DEFAULT_STRICTNESS;
 	private int debugLevel = DEFAULT_DEBUG_LEVEL;
@@ -46,6 +46,9 @@ public class Options {
 				}
 			} else if (arg.substring(0, 3).equals("-s=")) {
 				strictness = Integer.parseInt(arg.substring(3));
+			} else if (arg.equals("-detect-enc")) {
+				charset = null;
+				++charsetSet;
 			} else if (arg.equals("-sjis")) {
 				charset = Charsets.SHIFT_JIS;
 				++charsetSet;
@@ -90,9 +93,13 @@ public class Options {
 			"valid string (optional, default = " + DEFAULT_STRICTNESS + ")"
 		);
 		usage.append(
-			"\n\t-sjis\tTo interpret the input as Shift JIS " +
+			"\n\t-detect-enc\tTo let the program decide of the encoding " +
 			"(default if no encoding flag set, incompatible with other " +
 			"encoding flags)"
+		);
+		usage.append(
+			"\n\t-sjis\tTo interpret the input as Shift JIS " +
+			"(optional, incompatible with other encoding flags)"
 		);
 		usage.append(
 			"\n\t-utf16-be\tTo interpret the input as UTF-16 Big Endian " +
@@ -130,7 +137,9 @@ public class Options {
 	 *  - 1: Display the hex string corresponding to each line.
 	 *  - 2: Display the validity of each line.
 	 *  - 3: Display the input.
-	 *  - 4: Display strings for which validity < strictness.
+	 *  - 4: Display strings for which validity < strictness,
+	 *       including attempts at converting in a rejected charset if
+	 *       the charset was detected automatically
 	 *  - 5: Display the non formatted version of each line.
 	 *
 	 * @return The debug level of the program.

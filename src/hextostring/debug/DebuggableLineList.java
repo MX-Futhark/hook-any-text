@@ -1,5 +1,6 @@
 package hextostring.debug;
 
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,9 @@ import java.util.List;
  */
 public class DebuggableLineList {
 
+	private Charset charset;
+	private boolean charsetAutoDetected = false;
+
 	private String hexInput;
 	private List<DebuggableLine> lines = new LinkedList<>();
 
@@ -22,6 +26,32 @@ public class DebuggableLineList {
 
 	public DebuggableLineList(String hex) {
 		this.hexInput = hex;
+	}
+
+	public DebuggableLineList(String hex, Charset charset) {
+		this(hex);
+		this.charset = charset;
+	}
+
+	/**
+	 * Setter on the charset used for this list of lines.
+	 *
+	 * @param charset
+	 * 			The charset used for this list of lines.
+	 */
+	public void setCharset(Charset charset) {
+		this.charset = charset;
+	}
+
+	/**
+	 * Setter on the boolean determining whether or not the charset was
+	 * detected for this list of lines.
+	 *
+	 * @param charsetAutoDetected
+	 * 			Whether or not the charset was detected for this list of lines.
+	 */
+	public void setCharsetAutoDetected(boolean charsetAutoDetected) {
+		this.charsetAutoDetected = charsetAutoDetected;
 	}
 
 	/**
@@ -102,10 +132,59 @@ public class DebuggableLineList {
 	 * 			The string put after every line in the toString method.
 	 */
 	public void setLinesDecorations(String before, String after) {
-		for (DebuggableLine chunk : lines) {
-			chunk.setDecorationBefore(before);
-			chunk.setDecorationAfter(after);
+		for (DebuggableLine line : lines) {
+			line.setDecorationBefore(before);
+			line.setDecorationAfter(after);
 		}
+	}
+
+	/**
+	 * Getter on the sum of the validity of all non-converted strings in the
+	 * list.
+	 *
+	 * @param filterUnder
+	 * 			The threshold below which a line is not counted in the result.
+	 * @return The sum of the validity of all non-converted strings in the list.
+	 */
+	public int getTotalHexValidity(int filterUnder) {
+		return getTotalValidity(true, filterUnder);
+	}
+
+	/**
+	 * Getter on the sum of the validity of all converted strings in the list.
+	 *
+	 * @param filterUnder
+	 * 			The threshold below which a line is not counted in the result.
+	 * @return The sum of the validity of all converted strings in the list.
+	 */
+	public int getTotalReadableStringValidity(int filterUnder) {
+		return getTotalValidity(false, filterUnder);
+	}
+
+	private int getTotalValidity(boolean hex, int filterUnder) {
+		int total = 0;
+		for (DebuggableLine line : lines) {
+			if((hex ? line.getHexValidity() : line.getReadableStringValidity())
+					>= filterUnder) {
+
+				total += hex
+					? line.getHexValidity()
+					: line.getReadableStringValidity();
+			}
+		}
+		return total;
+	}
+
+	/**
+	 * Getter on the sum of the validity of all lines in the list.
+	 *
+ 	 * @param filterUnder
+	 * 			The threshold below which a line is not counted in the result.
+	 * @return The sum of the validity of all lines in the list.
+	 */
+	public int getTotalValidity(int filterUnder) {
+		return getTotalHexValidity(filterUnder)
+			+ getTotalReadableStringValidity(filterUnder);
 	}
 
 	/**
@@ -121,6 +200,9 @@ public class DebuggableLineList {
 		if (debugLevel >= 3) {
 			sb.append("input: " + hexInput + "\n");
 		}
+		if (debugLevel >= 1 && charsetAutoDetected) {
+			sb.append("Detected: " + charset + "\n");
+		}
 
 		List<DebuggableLine> displayedLines;
 		if (debugLevel >= 4) {
@@ -128,7 +210,9 @@ public class DebuggableLineList {
 		} else {
 			displayedLines = new LinkedList<>();
 			for (DebuggableLine line : lines) {
-				if (line.getValidity() >= converterStrictness) {
+				if (line.getValidity() >= converterStrictness
+						&& charset == line.getCharset()) {
+
 					displayedLines.add(line);
 				}
 			}

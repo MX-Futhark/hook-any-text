@@ -18,6 +18,9 @@ public class ConverterFactory {
 		new UTF16Converter(false);
 	private static UTF8Converter utf8ConverterInstance = new UTF8Converter();
 
+	private static EncodingAgnosticConverter encodingAgnosticConverterInstance =
+		new EncodingAgnosticConverter();
+
 	/**
 	 * Provides a converter for a given charset.
 	 *
@@ -26,13 +29,15 @@ public class ConverterFactory {
 	 * @return A fitting converter.
 	 */
 	public static Converter getConverterInstance(Charset charset) {
-		if (charset.equals(Charsets.SHIFT_JIS)) {
+		if (charset == Charsets.DETECT) {
+			return encodingAgnosticConverterInstance;
+		} else if (charset == Charsets.SHIFT_JIS) {
 			return sjisConverterInstance;
-		} else if (charset.equals(Charsets.UTF16_BE)) {
+		} else if (charset == Charsets.UTF16_BE) {
 			return utf16BEConverterInstance;
-		} else if (charset.equals(Charsets.UTF16_LE)) {
+		} else if (charset == Charsets.UTF16_LE) {
 			return utf16LEConverterInstance;
-		} else if (charset.equals(Charsets.UTF8)) {
+		} else if (charset == Charsets.UTF8) {
 			return utf8ConverterInstance;
 		} else {
 			throw new IllegalArgumentException("Invalid charset in options.");

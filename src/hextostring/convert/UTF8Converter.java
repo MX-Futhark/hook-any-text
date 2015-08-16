@@ -59,7 +59,9 @@ public class UTF8Converter extends Converter {
 			if (match.endsWith("0000")) {
 				match = match.substring(0, match.length() - 4);
 			}
-			if (!match.contains("ffff") && hex.indexOf(match) % 2 == 0) {
+			if (!match.contains("ffff") && hex.indexOf(match) % 2 == 0
+					&& match.length() > 0) {
+
 				results.add(match);
 			}
 		}

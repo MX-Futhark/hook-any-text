@@ -7,7 +7,7 @@ import hextostring.evaluate.Evaluator;
  *
  * @author Maxime PIA
  */
-public abstract class ReadableStringEvaluator implements Evaluator {
+public abstract class ReadableStringEvaluator implements Evaluator<String> {
 
 	// an invalid character reduces the validity of the string
 	public static final int INVALID_CHARS_MALUS = 4;

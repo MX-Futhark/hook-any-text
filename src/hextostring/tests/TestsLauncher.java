@@ -100,7 +100,7 @@ public class TestsLauncher {
 				out.print(inputs[i].getName(), indentLevel);
 
 				if (expectedOutput.equals(actualOutput)) {
-					out.println(" OK ");
+					out.println(" OK");
 				} else {
 					out.println(" FAILURE");
 					out.println("expected:", indentLevel + 1);
@@ -114,10 +114,15 @@ public class TestsLauncher {
 		}
 	}
 
-	private static void goThrough(File f, int indentLevel) {
+	private static void goThrough(File f, int indentLevel,
+			boolean detectEncoding) {
+
 		out.println(f.getName(), indentLevel);
 
-		if (f.getName().equals("sjis")) {
+		if (detectEncoding) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.DETECT);
+		} else if (f.getName().equals("sjis")) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS);
 		} else if (f.getName().equals("utf16-be")) {
@@ -145,7 +150,7 @@ public class TestsLauncher {
 			// recursively go through every directory
 			if (goFurther) {
 				for (File children : files) {
-					goThrough(children, indentLevel + 1);
+					goThrough(children, indentLevel + 1, detectEncoding);
 				}
 			}
 		}
@@ -161,7 +166,10 @@ public class TestsLauncher {
 		URL currentURL =
 			Main.class.getProtectionDomain().getCodeSource().getLocation();
 		File f = new File(currentURL.getPath() + "../tests");
-		goThrough(f, 0);
+		out.println("Without encoding detection:\n");
+		goThrough(f, 0, false);
+		out.println("\n----------\n\nWith encoding detection:\n");
+		goThrough(f, 0, true);
 	}
 
 }

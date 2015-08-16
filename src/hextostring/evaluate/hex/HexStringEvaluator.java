@@ -7,7 +7,7 @@ import hextostring.evaluate.Evaluator;
  *
  * @author Maxime PIA
  */
-public abstract class HexStringEvaluator implements Evaluator {
+public abstract class HexStringEvaluator implements Evaluator<String> {
 
 	// the longer the hex string, the more likely for it to be a valid one
 	public static final int HEX_LENGTH_VALIDITY_WEIGHT = 1;

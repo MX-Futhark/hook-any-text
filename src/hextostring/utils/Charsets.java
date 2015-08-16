@@ -16,4 +16,7 @@ public class Charsets {
 	// also used for test files
 	public static final Charset UTF8 = Charset.forName("UTF-8");
 
+	// not a charset, used for automatic recognition
+	public static final Charset DETECT = null;
+
 }

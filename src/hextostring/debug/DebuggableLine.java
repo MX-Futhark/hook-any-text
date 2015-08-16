@@ -1,5 +1,7 @@
 package hextostring.debug;
 
+import java.nio.charset.Charset;
+
 /**
  * Wraps all the necessary information to debug a line:
  *  - the original hex string for the line and its validity
@@ -14,14 +16,17 @@ public class DebuggableLine {
 	private String readableString;
 	private String formattedString;
 
+	private Charset charset;
+
 	private int hexValidity;
 	private int readableStringValidity;
 
 	private String decorationBefore = "";
 	private String decorationAfter = "";
 
-	public DebuggableLine(String hex) {
+	public DebuggableLine(String hex, Charset charset) {
 		this.hex = hex;
+		this.charset = charset;
 	}
 
 	/**
@@ -69,6 +74,15 @@ public class DebuggableLine {
 	 */
 	public void setFormattedString(String formattedString) {
 		this.formattedString = formattedString;
+	}
+
+	/**
+	 * Getter on the charset associated to the line.
+	 *
+	 * @return The charset associated to the line.
+	 */
+	public Charset getCharset() {
+		return charset;
 	}
 
 	/**
@@ -151,11 +165,14 @@ public class DebuggableLine {
 		if (debugLevel >= 1) {
 			sb.append("hex: 0x" + hex + "\n");
 		}
+		if (debugLevel >= 4) {
+			sb.append("supposed encoding: " + charset + "\n");
+		}
 		if (debugLevel >= 2) {
 			sb.append(
 				"validity: " +
 				"(hex: " + hexValidity + ") + " +
-				"(jsStr: " + readableStringValidity + ") = " +
+				"(str: " + readableStringValidity + ") = " +
 				getValidity() + "\n"
 			);
 		}

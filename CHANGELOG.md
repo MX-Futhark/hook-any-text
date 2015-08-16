@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 0.4.0 - 2015-16-08
+- Added encoding recognition.
+- Set default encoding to auto-recognized.
+- Improved Japanese recognition.
+
 ## 0.3.0 - 2015-15-08
 - Added support for games using UTF-8.
 
