@@ -1,0 +1,1025 @@
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title></title>
+        <!-- Required stylesheet -->
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/core/deck.core.css">
+
+        <!-- Extension CSS files go here. Remove or add as needed. -->
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/extensions/goto/deck.goto.css">
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/extensions/menu/deck.menu.css">
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/extensions/navigation/deck.navigation.css">
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/extensions/status/deck.status.css">
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/extensions/scale/deck.scale.css">
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/extensions/notes/deck.notes.css">
+
+        <!-- Style theme. More available in /themes/style/ or create your own. -->
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/themes/style/web-2.0.css">
+
+        <!-- Transition theme. More available in /themes/transition/ or create your own. -->
+        <link rel="stylesheet" media="screen" href="./libs/deck.js/themes/transition/horizontal-slide.css">
+
+        <!-- Basic black and white print styles -->
+        <link rel="stylesheet" media="print" href="./libs/deck.js/core/print.css">
+
+        <!-- Required Modernizr file -->
+        <script src="./libs/deck.js/modernizr.custom.js"></script>
+        <script src="./libs/fit.js/fit.js"></script>
+        
+        <style>
+            /* temporary */
+            img.background {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+            }
+            .tooltip {
+                display: block;
+                position: absolute;
+                padding: 4px;
+                margin: 2px;
+                border: 2px black solid;
+                font-size: 14px;
+            }
+            .mouse{
+                position: absolute;
+                width: 15px;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="deck-container" style="width: 962; height: 663;">
+        <div id="myPresentation">
+                <!-- iterate on all the screens -->
+                <section class="slide" id="scr1" data-dahu-animator="anim_scr1">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/01.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m1"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="9a9037ce-7a8f-48bc-aeb7-cc442cebdd4a"
+                        style="background-color: #FFFFDF; width: 240px; top:246.9675; left: 356.3248;">
+                        <p style="text-align: center;"><span style="font-size: 18px;">Welcome to this demo!</span></p><p style="text-align: center;"><br></p><p style="text-align: center;"><span style="font-size: 18px;">Use the left and right arrows&nbsp;</span><span style="font-size: 18px;">on your&nbsp;</span><span style="font-size: 18px;">keyboard to navigate in it.</span></p>
+                    </div>
+                    <div class="tooltip" id="2c226426-d68d-4222-a664-81db114f8f21"
+                        style="background-color: #FFFFDF; width: 115; top:216.00539999999998; left: 28.1866;">
+                        <span style="font-size: 14px;">Game or emulator</span>
+                    </div>
+                    <div class="tooltip" id="5ea6c877-8784-4bcd-80bf-29f21405c15d"
+                        style="background-color: #FFFFDF; width: 252; top:269.3106; left: 629.3404;">
+                        <span style="font-size: 14px;">Cheat Engine with Hook Any Text installed</span>
+                    </div>
+                    <div class="tooltip" id="ecc7da44-d027-4270-8694-19f7797ac448"
+                        style="background-color: #FFFFDF; width: 191; top:570.9756; left: 546.3198;">
+                        <span style="font-size: 14px;">Translation Aggregator (optional)</span>
+                    </div>
+                    <div class="tooltip" id="34b0b998-cc16-40ee-95ae-5076f3d3636f"
+                        style="background-color: #FFFFDF; width: 283; top:103.03020000000001; left: 547.3779999999999;">
+                        <span style="font-size: 14px;">Select the process corresponding to your game.</span>
+                    </div>
+                    <script>
+                        var anim_scr1 =
+                        {
+                            "target": "#scr1",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-1-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m1",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 467,
+                                    "trY": 166
+                                },
+                                {
+                                    "id": "action-1-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#2c226426-d68d-4222-a664-81db114f8f21",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-1-2",
+                                    "trigger": "withPrevious",
+                                    "target": "#5ea6c877-8784-4bcd-80bf-29f21405c15d",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-1-3",
+                                    "trigger": "withPrevious",
+                                    "target": "#ecc7da44-d027-4270-8694-19f7797ac448",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-1-4",
+                                    "trigger": "withPrevious",
+                                    "target": "#34b0b998-cc16-40ee-95ae-5076f3d3636f",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-1-5",
+                                    "trigger": "onChange",
+                                    "target": "#9a9037ce-7a8f-48bc-aeb7-cc442cebdd4a",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-6",
+                                    "trigger": "afterPrevious",
+                                    "target": "#2c226426-d68d-4222-a664-81db114f8f21",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-7",
+                                    "trigger": "afterPrevious",
+                                    "target": "#5ea6c877-8784-4bcd-80bf-29f21405c15d",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-8",
+                                    "trigger": "afterPrevious",
+                                    "target": "#ecc7da44-d027-4270-8694-19f7797ac448",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-9",
+                                    "trigger": "onChange",
+                                    "target": "#2c226426-d68d-4222-a664-81db114f8f21",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-10",
+                                    "trigger": "withPrevious",
+                                    "target": "#5ea6c877-8784-4bcd-80bf-29f21405c15d",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-11",
+                                    "trigger": "withPrevious",
+                                    "target": "#ecc7da44-d027-4270-8694-19f7797ac448",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-12",
+                                    "trigger": "withPrevious",
+                                    "target": "#34b0b998-cc16-40ee-95ae-5076f3d3636f",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-1-13",
+                                    "trigger": "afterPrevious",
+                                    "target": "#m1",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": -46,
+                                    "trY": -100
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr2" data-dahu-animator="anim_scr2">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/02.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m2"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr2 =
+                        {
+                            "target": "#scr2",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-2-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m2",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 421,
+                                    "trY": 66
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr3" data-dahu-animator="anim_scr3">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/03.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m3"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr3 =
+                        {
+                            "target": "#scr3",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-3-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m3",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 421,
+                                    "trY": 66
+                                },
+                                {
+                                    "id": "action-2-1",
+                                    "trigger": "afterPrevious",
+                                    "target": "#m3",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 205,
+                                    "trY": 172
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr4" data-dahu-animator="anim_scr4">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/04.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m4"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr4 =
+                        {
+                            "target": "#scr4",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-4-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m4",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 626,
+                                    "trY": 238
+                                },
+                                {
+                                    "id": "action-4-1",
+                                    "trigger": "onChange",
+                                    "target": "#m4",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 0,
+                                    "trY": 51
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr5" data-dahu-animator="anim_scr5">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/05.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m5"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="2a03f34a-7e22-4881-b348-334f68ce8d9c"
+                        style="background-color: #FFFFDF; width: 280px; top:513.6924; left: 429.8216;">
+                        <span style="font-size: 14px;">Write the Japanese line you can see in the game.</p><p>If you can't speak Japanese, see <a href="https://github.com/MX-Futhark/hook-any-text/wiki/Troubleshooting#i-want-to-use-hat-because-i-cant-read-japanese-and-yet-it-expects-me-to-write-japanese-to-use-it" target="_blank">this page</a>.</span>
+                    </div>
+                    <script>
+                        var anim_scr5 =
+                        {
+                            "target": "#scr5",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-5-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m5",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 626,
+                                    "trY": 289
+                                },
+                                {
+                                    "id": "action-5-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#2a03f34a-7e22-4881-b348-334f68ce8d9c",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-5-2",
+                                    "trigger": "afterPrevious",
+                                    "target": "#m5",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 127,
+                                    "trY": 300
+                                },
+                                {
+                                    "id": "action-5-3",
+                                    "trigger": "afterPrevious",
+                                    "target": "#2a03f34a-7e22-4881-b348-334f68ce8d9c",
+                                    "type": "appear",
+                                    "duration": 400
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr6" data-dahu-animator="anim_scr6">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/06.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m6"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="2c5efc16-8dc7-496f-a8a3-f6725484bac3"
+                        style="background-color: #FFFFDF; width: 227; top:577.0088999999999; left: 442.32759999999996;">
+                        <span style="font-size: 14px;">Convert it to the encoding of the game.</span>
+                    </div>
+                    <script>
+                        var anim_scr6 =
+                        {
+                            "target": "#scr6",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-6-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m6",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 753,
+                                    "trY": 589
+                                },
+                                {
+                                    "id": "action-6-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#2c5efc16-8dc7-496f-a8a3-f6725484bac3",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-6-2",
+                                    "trigger": "onChange",
+                                    "target": "#2c5efc16-8dc7-496f-a8a3-f6725484bac3",
+                                    "type": "appear",
+                                    "duration": 400
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr7" data-dahu-animator="anim_scr7">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/07.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m7"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr7 =
+                        {
+                            "target": "#scr7",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-7-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m7",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 753,
+                                    "trY": 589
+                                },
+                                {
+                                    "id": "action-7-1",
+                                    "trigger": "onChange",
+                                    "target": "#m7",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 65,
+                                    "trY": -257
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr8" data-dahu-animator="anim_scr8">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/08.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m8"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr8 =
+                        {
+                            "target": "#scr8",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-8-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m8",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 818,
+                                    "trY": 332
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr9" data-dahu-animator="anim_scr9">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/09.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m9"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="e7177ffc-dcf0-4524-a6a1-db2199201bbb"
+                        style="background-color: #FFFFDF; width: 243; top:303.8529; left: 405.77160000000003;">
+                        <span style="font-size: 14px;">Scan the game using Cheat Engine to find this array of bytes.</span>
+                    </div>
+                    <script>
+                        var anim_scr9 =
+                        {
+                            "target": "#scr9",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-9-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m9",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 818,
+                                    "trY": 332
+                                },
+                                {
+                                    "id": "action-9-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#e7177ffc-dcf0-4524-a6a1-db2199201bbb",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-9-2",
+                                    "trigger": "afterPrevious",
+                                    "target": "#e7177ffc-dcf0-4524-a6a1-db2199201bbb",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-9-3",
+                                    "trigger": "onChange",
+                                    "target": "#m9",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 34,
+                                    "trY": 266
+                                },
+                                {
+                                    "id": "action-9-4",
+                                    "trigger": "afterPrevious",
+                                    "target": "#m9",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": -129,
+                                    "trY": -32
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr10" data-dahu-animator="anim_scr10">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/10.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m10"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="1e689e4d-3eb7-4a32-8d90-204b49384fae"
+                        style="background-color: #DFDFFF; width: 116; top:609.0318; left: 4.329;">
+                        <div style="text-align: center;"><span style="font-size: 24px;">Ctrl+C</span></div>
+                    </div>
+                    <script>
+                        var anim_scr10 =
+                        {
+                            "target": "#scr10",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-10-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m10",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 723,
+                                    "trY": 566
+                                },
+                                {
+                                    "id": "action-10-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#1e689e4d-3eb7-4a32-8d90-204b49384fae",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-10-2",
+                                    "trigger": "withPrevious",
+                                    "target": "#1e689e4d-3eb7-4a32-8d90-204b49384fae",
+                                    "type": "appear",
+                                    "duration": 200
+                                },
+                                {
+                                    "id": "action-10-3",
+                                    "trigger": "onChange",
+                                    "target": "#1e689e4d-3eb7-4a32-8d90-204b49384fae",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-10-4",
+                                    "trigger": "afterPrevious",
+                                    "target": "#m10",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 0,
+                                    "trY": -360
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr11" data-dahu-animator="anim_scr11">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/11.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m11"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr11 =
+                        {
+                            "target": "#scr11",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-11-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m11",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 723,
+                                    "trY": 206
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr12" data-dahu-animator="anim_scr12">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/12.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m12"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr12 =
+                        {
+                            "target": "#scr12",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-12-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m12",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 723,
+                                    "trY": 206
+                                },
+                                {
+                                    "id": "action-12-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#m12",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 0,
+                                    "trY": 119
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr13" data-dahu-animator="anim_scr13">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/13.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m13"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr13 =
+                        {
+                            "target": "#scr13",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-13-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m13",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 723,
+                                    "trY": 325
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr14" data-dahu-animator="anim_scr14">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/14.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m14"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="bb581aee-edf7-4029-bf7a-30f14047af8c"
+                        style="background-color: #DFDFFF; width: 116; top:609.0318; left: 4.329;">
+                        <div style="text-align: center;"><span style="font-size: 24px;">Ctrl+V</span></div>
+                    </div>
+                    <script>
+                        var anim_scr14 =
+                        {
+                            "target": "#scr14",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-14-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m14",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 723,
+                                    "trY": 325
+                                },
+                                {
+                                    "id": "action-14-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#bb581aee-edf7-4029-bf7a-30f14047af8c",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-14-2",
+                                    "trigger": "onChange",
+                                    "target": "#m14",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 0,
+                                    "trY": -170
+                                },
+                                {
+                                    "id": "action-14-3",
+                                    "trigger": "afterPrevious",
+                                    "target": "#bb581aee-edf7-4029-bf7a-30f14047af8c",
+                                    "type": "appear",
+                                    "duration": 200
+                                },
+                                {
+                                    "id": "action-14-4",
+                                    "trigger": "onChange",
+                                    "target": "#bb581aee-edf7-4029-bf7a-30f14047af8c",
+                                    "type": "disappear",
+                                    "duration": 400
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr15" data-dahu-animator="anim_scr15">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/15.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m15"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr15 =
+                        {
+                            "target": "#scr15",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-15-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m15",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 723,
+                                    "trY": 155
+                                },
+                                {
+                                    "id": "action-15-1",
+                                    "trigger": "onChange",
+                                    "target": "#m15",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": -57,
+                                    "trY": -46
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr16" data-dahu-animator="anim_scr16">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/16.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m16"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr16 =
+                        {
+                            "target": "#scr16",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-16-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m16",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 666,
+                                    "trY": 109
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr17" data-dahu-animator="anim_scr17">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/17.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m17"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="48a700e0-a570-4049-b3eb-0ec2302ef334"
+                        style="background-color: #FFFFDF; width: 178; top:260.0286; left: 414.33340000000004;">
+                        <p><span style="font-size: 14px;">Select the right address.</span></p><p><span style="font-size: 14px;">See <a href="https://github.com/MX-Futhark/hook-any-text/wiki/User-Manual" target="_blank" >here</a> for more details.</span></p>
+                    </div>
+                    <script>
+                        var anim_scr17 =
+                        {
+                            "target": "#scr17",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-17-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m17",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 666,
+                                    "trY": 109
+                                },
+                                {
+                                    "id": "action-17-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#48a700e0-a570-4049-b3eb-0ec2302ef334",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-17-2",
+                                    "trigger": "withPrevious",
+                                    "target": "#48a700e0-a570-4049-b3eb-0ec2302ef334",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-17-3",
+                                    "trigger": "onChange",
+                                    "target": "#48a700e0-a570-4049-b3eb-0ec2302ef334",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-17-4",
+                                    "trigger": "withPrevious",
+                                    "target": "#m17",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": -206,
+                                    "trY": 58
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr18" data-dahu-animator="anim_scr18">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/18.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m18"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="222d2641-1dd1-4050-8bd4-e2902490acc7"
+                        style="background-color: #DFDFFF; width: 116; top:609.0318; left: 4.329;">
+                        <div style="text-align: center;"><span style="font-size: 24px;">Ctrl+B</span></div>
+                    </div>
+                    <script>
+                        var anim_scr18 =
+                        {
+                            "target": "#scr18",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-18-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m18",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 460,
+                                    "trY": 167
+                                },
+                                {
+                                    "id": "action-18-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#222d2641-1dd1-4050-8bd4-e2902490acc7",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-18-2",
+                                    "trigger": "withPrevious",
+                                    "target": "#222d2641-1dd1-4050-8bd4-e2902490acc7",
+                                    "type": "appear",
+                                    "duration": 200
+                                },
+                                {
+                                    "id": "action-18-3",
+                                    "trigger": "onChange",
+                                    "target": "#222d2641-1dd1-4050-8bd4-e2902490acc7",
+                                    "type": "disappear",
+                                    "duration": 400
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr19" data-dahu-animator="anim_scr19">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/19.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m19"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="e2ec42eb-c351-42f6-ae5e-ba6b47c5e7b0"
+                        style="background-color: #FFFFDF; width: 307; top:302.991; left: 327.3686;">
+                        <span style="font-size: 14px;">Select a region in the memory encompassing the text displayed in the game.</span>
+                    </div>
+                    <script>
+                        var anim_scr19 =
+                        {
+                            "target": "#scr19",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-19-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m19",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 460,
+                                    "trY": 167
+                                },
+                                {
+                                    "id": "action-19-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#e2ec42eb-c351-42f6-ae5e-ba6b47c5e7b0",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-19-2",
+                                    "trigger": "withPrevious",
+                                    "target": "#e2ec42eb-c351-42f6-ae5e-ba6b47c5e7b0",
+                                    "type": "appear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-19-3",
+                                    "trigger": "afterPrevious",
+                                    "target": "#m19",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 203,
+                                    "trY": 151
+                                },
+                                {
+                                    "id": "action-19-4",
+                                    "trigger": "onChange",
+                                    "target": "#e2ec42eb-c351-42f6-ae5e-ba6b47c5e7b0",
+                                    "type": "disappear",
+                                    "duration": 400
+                                },
+                                {
+                                    "id": "action-19-5",
+                                    "trigger": "withPrevious",
+                                    "target": "#m19",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": 192,
+                                    "trY": 93
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr20" data-dahu-animator="anim_scr20">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/20.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m20"
+                         style="top: 0; left:0;">
+                    <script>
+                        var anim_scr20 =
+                        {
+                            "target": "#scr20",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-20-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m20",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 855,
+                                    "trY": 411
+                                },
+                                {
+                                    "id": "action-20-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#m20",
+                                    "type": "move",
+                                    "duration": 600,
+                                    "trX": -313,
+                                    "trY": 202
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+                <section class="slide" id="scr21" data-dahu-animator="anim_scr21">
+                    <!-- iterate on all objects, show only images -->
+                    <img src="img/21.png" class="background" style="width:962; height:663;">
+                    <img src="./img/cursor.png" class="mouse" id="m21"
+                         style="top: 0; left:0;">
+                    <div class="tooltip" id="c027098c-d81c-41b6-bef1-4519fc32bea7"
+                        style="background-color: #FFFFDF; width: 494; top:231.5859; left: 196.248;">
+                        <p style="text-align: center;"><span style="font-size: 18px;">You can now play.</span></p><p style="text-align: center; "><span style="font-size: 18px;">Every new line will be put into the clipboard.</span></p><p style="text-align: center; "><span style="font-size: 18px;">Thank you for your interest in Hook Any Text!</span></p><p style="text-align: center; "><br></p><p style="text-align: center; "><span style="font-size: 18px;"><a href="http://mx-futhark.github.io/hook-any-text/" target="_blank">go back to the website</a></span></p>
+                    </div>
+                    <script>
+                        var anim_scr21 =
+                        {
+                            "target": "#scr21",
+                            "actions":
+                            [
+                                {
+                                    "id": "action-21-0",
+                                    "trigger": "withPrevious",
+                                    "target": "#m21",
+                                    "type": "move",
+                                    "duration": 0,
+                                    "trX": 542,
+                                    "trY": 613
+                                },
+                                {
+                                    "id": "action-21-1",
+                                    "trigger": "withPrevious",
+                                    "target": "#c027098c-d81c-41b6-bef1-4519fc32bea7",
+                                    "type": "disappear",
+                                    "duration": 0
+                                },
+                                {
+                                    "id": "action-21-2",
+                                    "trigger": "withPrevious",
+                                    "target": "#c027098c-d81c-41b6-bef1-4519fc32bea7",
+                                    "type": "appear",
+                                    "duration": 400
+                                }
+                            ]
+                        };
+                    </script>
+                </section>
+        </div>
+    </div>
+    <!-- Required JS files. -->
+    <script src="./libs/deck.js/jquery.min.js"></script>
+    <script src="./libs/deck.js/core/deck.core.js"></script>
+
+    <!-- Extension JS files. Add or remove as needed. -->
+    <script src="./libs/deck.js/extensions/menu/deck.menu.js"></script>
+    <script src="./libs/deck/deck.js/extensions/goto/deck.goto.js"></script>
+    <script src="./libs/deck.js/extensions/status/deck.status.js"></script>
+    <script src="./libs/deck.js/extensions/navigation/deck.navigation.js"></script>
+    <script src="./libs/deck.js/extensions/scale/deck.scale.js"></script>
+    <script src="./libs/deck.js/extensions/notes/deck.notes.js"></script>
+    <script src="./libs/deck.js/extensions/animator/animator.js"></script>
+    <script src="./libs/deck.js/extensions/animator/deck.animator.js"></script>
+
+    <!-- Initialize the deck. You can put this in an external file if desired. -->
+    <script>
+        $(function () {
+            $.deck('.slide');
+            var body = $('body').get(0);
+            var cont = $.deck('getContainer').get(0);			
+            fit(cont, body, {
+                hAlign: fit.CENTER,
+                vAlign: fit.CENTER,
+                watch: true,
+                cover: false
+            });
+        });
+    </script>
+    </body>
+</html>

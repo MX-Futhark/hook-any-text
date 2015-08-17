@@ -1,0 +1,47 @@
+@mixin box-shadow($x, $y, $blur, $color) {
+    -webkit-box-shadow:$x $y $blur $color;
+    -moz-box-shadow:$x $y $blur $color;
+    box-shadow:$x $y $blur $color;
+}
+
+.deck-container {
+    .notes {
+        display: none;
+    }
+}
+
+.deck-notes {
+    position: absolute;
+    background-color: #DDE4EB;
+    z-index: 15;
+    top: 0px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    display: none;
+    overflow-y: auto;
+    overflow-x: none;
+    
+    .deck-notes-header {
+        width: 100%;
+        font-size: 1.5em;
+        padding-left: 0.25em;
+        @include box-shadow(0, 2px, 2px, rgba(0, 0, 0, 0.2));
+    }
+    
+    .deck-notes-container {
+        margin-top: 2px;
+        border-top: 1px solid white;
+        padding: 0.625em;
+    }
+    
+    .notes {
+        display: block;
+    }
+}
+
+@media print {
+    .deck-toc {
+        display:none;
+    }
+}
