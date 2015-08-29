@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 0.4.1 - 2015-29-08
+- Fixed #2
+- Fixed #3
+
 ## 0.4.0 - 2015-16-08
 - Added encoding recognition.
 - Set default encoding to auto-recognized.
