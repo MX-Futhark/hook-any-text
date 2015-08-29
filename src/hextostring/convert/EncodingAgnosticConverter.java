@@ -38,7 +38,8 @@ public class EncodingAgnosticConverter extends Converter {
 	public DebuggableLineList convert(String hex) {
 		boolean encodingFound = false;
 		int maxValidity = 0;
-		DebuggableLineList allLines = new DebuggableLineList(hex);
+		DebuggableLineList allLines =
+			new DebuggableLineList(preProcessHex(hex));
 		allLines.setCharsetAutoDetected(true);
 
 		for (Converter c : converters) {

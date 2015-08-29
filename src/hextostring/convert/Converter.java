@@ -58,7 +58,7 @@ public abstract class Converter {
 	 * @return
 	 * 			The lowercase, sans spaces version of the input string.
 	 */
-	private static String preProcessHex(String hex) {
+	protected static String preProcessHex(String hex) {
 		String lowercaseHex =
 			hex.toLowerCase().replace(" ", "").replace("\n", "");
 		if (!lowercaseHex.matches("[a-f0-9]+")) {
