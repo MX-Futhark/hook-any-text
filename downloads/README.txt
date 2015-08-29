@@ -114,6 +114,10 @@
   Changelog
   ---------
 
+  0.4.1 - 2015-29-08
+   - Fixed rejection of valid Shift-JIS strings
+   - Added input preprocessing before encoding recognition
+
   0.4.0 - 2015-16-08
    - Added encoding recognition.
    - Set default encoding to auto-recognized.
