@@ -51,7 +51,7 @@ public class UTF8Converter extends Converter {
 			"f[2-3]([8-9a-b][0-9a-f]){3}|" +
 			// U+100000 to U+10FFFF: 11110100 1000xxxx 10xxxxxx 10xxxxxx
 			"f48[0-9a-f]([8-9a-b][0-9a-f]){2}|" +
-			")*?(0000|$)"
+			")+?(0000|$)"
 		).matcher(hex);
 		String match;
 		while (m.find()) {
@@ -59,8 +59,7 @@ public class UTF8Converter extends Converter {
 			if (match.endsWith("0000")) {
 				match = match.substring(0, match.length() - 4);
 			}
-			if (!match.contains("ffff") && hex.indexOf(match) % 2 == 0
-					&& match.length() > 0) {
+			if (!match.contains("ffff") && hex.indexOf(match) % 2 == 0) {
 
 				results.add(match);
 			}

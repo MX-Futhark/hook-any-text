@@ -24,7 +24,7 @@ public class SJISConverter extends Converter {
 		// Keeps everything that looks like Shift-JIS,
 		// with some margin for non-standard characters.
 		Matcher m = Pattern.compile(
-			"(8[a-f1-9]|9[a-f0-9]|23)([a-f1-9][a-f0-9]|0[a-f1-9])+(00|$)")
+			"(8[a-f1-9]|[9e-f][a-f0-9]|23)([a-f1-9][a-f0-9]|0[a-f1-9])+?(00|$)")
 			.matcher(hex);
 		String match;
 		while (m.find()) {

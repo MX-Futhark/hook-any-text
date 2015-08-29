@@ -21,15 +21,14 @@ public class UTF16Converter extends Converter {
 	@Override
 	protected List<String> extractConvertibleChunks(String hex) {
 		List<String> results = new LinkedList<>();
-		Matcher m = Pattern.compile("([0-9a-f]{4})*?(0000|$)").matcher(hex);
+		Matcher m = Pattern.compile("([0-9a-f]{4})+?(0000|$)").matcher(hex);
 		String match;
 		while (m.find()) {
 			match = m.group();
 			if (match.endsWith("0000")) {
 				match = match.substring(0, match.length() - 4);
 			}
-			if (!match.contains("ffff") && hex.indexOf(match) % 2 == 0
-					&& match.length() > 0) {
+			if (!match.contains("ffff") && hex.indexOf(match) % 2 == 0) {
 
 				results.add(match);
 			}
