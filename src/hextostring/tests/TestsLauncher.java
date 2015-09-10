@@ -13,7 +13,12 @@ import hextostring.utils.IndentablePrintStream;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Main test class.
@@ -74,7 +79,7 @@ public class TestsLauncher {
 		return files;
 	}
 
-	private static void compare(File inputFile, File expectedOutputFile,
+	private static boolean compare(File inputFile, File expectedOutputFile,
 		int indentLevel) {
 
 		try {
@@ -97,32 +102,44 @@ public class TestsLauncher {
 
 			if (expectedOutput.equals(actualOutput)) {
 				out.println(" OK");
+				return true;
 			} else {
 				out.println(" FAILURE");
 				out.println("expected:", indentLevel + 1);
 				out.println(expectedOutput, indentLevel + 2);
 				out.println("instead of:", indentLevel + 1);
 				out.println(actualOutput, indentLevel + 2);
+				return false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
-	private static void compareAll(File inputDirectory,
+	private static Map<Boolean, Integer> compareAll(File inputDirectory,
 		File expectedOutputDirectory, int indentLevel) {
 
 		File[] inputs = listSortedFiles(inputDirectory);
 		File[] expectedOutputs = listSortedFiles(expectedOutputDirectory);
 
+		Map<Boolean, Integer> testResult = new HashMap<>();
+		testResult.put(false, 0);
+		testResult.put(true, 0);
+
 		for (int i = 0; i < inputs.length && i < expectedOutputs.length; ++i) {
-			compare(inputs[i], expectedOutputs[i], indentLevel);
+			boolean eq = compare(inputs[i], expectedOutputs[i], indentLevel);
+			testResult.put(eq, testResult.get(eq) + 1);
 		}
+
+		return testResult;
 	}
 
 	private static boolean isEncoding(File f, String encodingName) {
-		return f.getName().equals(encodingName)
-			|| isEncoding(f.getParentFile(), encodingName);
+		return f == null
+			? false
+			: f.getName().equals(encodingName)
+				|| isEncoding(f.getParentFile(), encodingName);
 	}
 
 	private static void setEncoding(File f, boolean detectEncoding) {
@@ -144,8 +161,12 @@ public class TestsLauncher {
 		}
 	}
 
-	private static void goThrough(File f, int indentLevel,
+	private static Map<Boolean, Integer> goThrough(File f, int indentLevel,
 			boolean detectEncoding) {
+
+		Map<Boolean, Integer> dirResult = new HashMap<>();
+		dirResult.put(false, 0);
+		dirResult.put(true, 0);
 
 		out.println(f.getName(), indentLevel);
 
@@ -154,10 +175,13 @@ public class TestsLauncher {
 		if (f.isDirectory()) {
 			File[] files = listSortedFiles(f);
 			boolean goFurther = true;
+			List<Map<Boolean, Integer>> comparisonResults = new LinkedList<>();
 
 			if (files.length == 2) {
 				if (files[0].getName().equals("expected_output")) {
-					compareAll(files[1], files[0], indentLevel + 1);
+					comparisonResults.add(
+						compareAll(files[1], files[0], indentLevel + 1)
+					);
 					goFurther = false;
 				}
 			}
@@ -165,10 +189,31 @@ public class TestsLauncher {
 			// recursively go through every directory
 			if (goFurther) {
 				for (File children : files) {
-					goThrough(children, indentLevel + 1, detectEncoding);
+					comparisonResults.add(
+						goThrough(children, indentLevel + 1, detectEncoding)
+					);
 				}
 			}
+
+			for (Map<Boolean, Integer> result : comparisonResults) {
+				dirResult.put(false, dirResult.get(false) + result.get(false));
+				dirResult.put(true, dirResult.get(true) + result.get(true));
+			}
 		}
+
+		displayTestResult(dirResult, f.getName(), indentLevel);
+		return dirResult;
+	}
+
+	private static void displayTestResult(Map<Boolean, Integer> result,
+		String testName, int indentLevel) {
+
+		double percentageOk =
+			result.get(true) * 100.0
+			/ (result.get(true) + result.get(false));
+		DecimalFormat df = new DecimalFormat("##0.00");
+		out.println("Total " + testName + ": "
+			+ df.format(percentageOk) + "% OK", indentLevel);
 	}
 
 	private static final String NODETECT_MSG = "Without encoding detection:\n";
