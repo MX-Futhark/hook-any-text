@@ -40,7 +40,7 @@ import java.util.Arrays;
  *   | |   |-...
  *   | |-[game2]
  *   | |-...
- *   |-utf16-be  (contains tests for games using UTF-16 Big Endian)
+ *   |-utf16-be (contains tests for games using UTF-16 Big Endian)
  *   | |-[gameA]
  *   | | |-input
  *   | | | |-0001.txt
@@ -52,9 +52,9 @@ import java.util.Arrays;
  *   | |   |-...
  *   | |-[gameB]
  *   | |-...
- *   |-utf16-le  (contains tests for games using UTF-16 Little Endian)
+ *   |-utf16-le (contains tests for games using UTF-16 Little Endian)
  *   | |-...
- *   |-utf8  (contains tests for games using UTF-8)
+ *   |-utf8 (contains tests for games using UTF-8)
  *     |-...
  *
  * It is assumed that all .txt files are encoded in UTF-8, without the BOM.

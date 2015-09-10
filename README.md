@@ -77,7 +77,7 @@ Test files are put into the tests directory. Its architecture is as follows:
         | |   |-...
         | |-[game2]
         | |-...
-        |-utf16  (contains tests for games using UTF-16)
+        |-utf16 (contains tests for games using UTF-16)
         | |-[gameA]
         | | |-input
         | | | |-0001.txt
@@ -89,9 +89,9 @@ Test files are put into the tests directory. Its architecture is as follows:
         | |   |-...
         | |-[gameB]
         | |-...
-        |-utf16-le  (contains tests for games using UTF-16 Little Endian)
+        |-utf16-le (contains tests for games using UTF-16 Little Endian)
         | |-...
-        |-utf8  (contains tests for games using UTF-8)
+        |-utf8 (contains tests for games using UTF-8)
           |-...
 
           
