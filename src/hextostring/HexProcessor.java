@@ -2,7 +2,7 @@ package hextostring;
 
 import hextostring.convert.Converter;
 import hextostring.convert.ConverterFactory;
-import hextostring.debug.DebuggableLineList;
+import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
 import hextostring.utils.Clipboard;
@@ -53,23 +53,23 @@ public class HexProcessor {
 					break;
 				}
 
-				DebuggableLineList dInput = converter.convert(hex);
-				formatter.format(dInput);
+				DebuggableStrings dInput = converter.convert(hex);
+				formatter.format(dInput.getValidLineList());
 				result = dInput.toString(
-					opts.getDebugLevel(),
+					opts.getDebuggingFlags(),
 					opts.getStrictness()
 				);
 
 				// avoid unnecessarily updating the clipboard
 				if (!result.equals(previousResult)) {
-					if(opts.getDebugLevel() > 0) {
+					if(opts.getDebuggingFlags() > 0) {
 						print(result, out);
 					}
 					Clipboard.set(result);
 					previousResult = result;
 				}
 			} catch (Exception e) {
-				if (opts.getDebugLevel() > 0) {
+				if (opts.getDebuggingFlags() > 0) {
 					e.printStackTrace();
 				} else {
 					print(e.getMessage(), out);

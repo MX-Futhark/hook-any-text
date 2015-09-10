@@ -1,6 +1,5 @@
 package hextostring.debug;
 
-import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,10 +11,7 @@ import java.util.List;
  *
  * @author Maxime PIA
  */
-public class DebuggableLineList {
-
-	private Charset charset;
-	private boolean charsetAutoDetected = false;
+public class DebuggableLineList implements DebuggableStrings {
 
 	private String hexInput;
 	private List<DebuggableLine> lines = new LinkedList<>();
@@ -28,30 +24,8 @@ public class DebuggableLineList {
 		this.hexInput = hex;
 	}
 
-	public DebuggableLineList(String hex, Charset charset) {
-		this(hex);
-		this.charset = charset;
-	}
-
-	/**
-	 * Setter on the charset used for this list of lines.
-	 *
-	 * @param charset
-	 * 			The charset used for this list of lines.
-	 */
-	public void setCharset(Charset charset) {
-		this.charset = charset;
-	}
-
-	/**
-	 * Setter on the boolean determining whether or not the charset was
-	 * detected for this list of lines.
-	 *
-	 * @param charsetAutoDetected
-	 * 			Whether or not the charset was detected for this list of lines.
-	 */
-	public void setCharsetAutoDetected(boolean charsetAutoDetected) {
-		this.charsetAutoDetected = charsetAutoDetected;
+	public DebuggableLineList getValidLineList() {
+		return this;
 	}
 
 	/**
@@ -164,12 +138,16 @@ public class DebuggableLineList {
 	private int getTotalValidity(boolean hex, int filterUnder) {
 		int total = 0;
 		for (DebuggableLine line : lines) {
-			if((hex ? line.getHexValidity() : line.getReadableStringValidity())
+			int hexValidity = line.getHexEvaluationResult().getMark();
+			int readableStringValidity =
+				line.getReadableStringEvaluationResult().getMark();
+
+			if((hex ? hexValidity : readableStringValidity)
 					>= filterUnder) {
 
 				total += hex
-					? line.getHexValidity()
-					: line.getReadableStringValidity();
+					? hexValidity
+					: readableStringValidity;
 			}
 		}
 		return total;
@@ -179,7 +157,7 @@ public class DebuggableLineList {
 	 * Getter on the sum of the validity of all lines in the list.
 	 *
  	 * @param filterUnder
-	 * 			The threshold below which a line is not counted in the result.
+	 * 			The threshold below which a line is excluded from the total.
 	 * @return The sum of the validity of all lines in the list.
 	 */
 	public int getTotalValidity(int filterUnder) {
@@ -187,55 +165,48 @@ public class DebuggableLineList {
 			+ getTotalReadableStringValidity(filterUnder);
 	}
 
-	/**
-	 * Formats these lines depending on the debugging level.
-	 *
-	 * @param debugLevel
-	 * 			The debug level used to format these lines.
-	 * @return a string representing these lines, with or without debug traces.
-	 */
-	public String toString(int debugLevel, int converterStrictness) {
+	@Override
+	public String toString(long debuggingFlags, int converterStrictness) {
 		StringBuilder sb = new StringBuilder();
 
-		if (debugLevel >= 3) {
-			sb.append("input: " + hexInput + "\n");
-		}
-		if (debugLevel >= 1 && charsetAutoDetected) {
-			sb.append("Detected: " + charset + "\n");
+		if ((debuggingFlags & DebuggingFlags.LINE_LIST_HEX_INPUT) > 0) {
+			sb.append("input: 0x" + hexInput + "\n");
 		}
 
 		List<DebuggableLine> displayedLines;
-		if (debugLevel >= 4) {
+		if ((debuggingFlags & DebuggingFlags.LINE_REJECTED) > 0) {
 			displayedLines = lines;
 		} else {
 			displayedLines = new LinkedList<>();
 			for (DebuggableLine line : lines) {
-				if (line.getValidity() >= converterStrictness
-						&& charset == line.getCharset()) {
-
+				if (line.getValidity() >= converterStrictness) {
 					displayedLines.add(line);
 				}
 			}
 		}
 
 		sb.append(decorationBefore);
-		if (debugLevel >= 1) {
+		if (debuggingFlags > 0) {
 			sb.append("\n");
 		}
-		if(displayedLines.size() > 0) {
+		if (displayedLines.size() > 0) {
 			DebuggableLine lastDisplayedLine = displayedLines
 				.get(displayedLines.size() - 1);
 			for (DebuggableLine line : displayedLines) {
-				sb.append(line.toString(debugLevel));
+				sb.append(line.toString(debuggingFlags));
 				if (line != lastDisplayedLine) {
 					sb.append(decorationBetween);
 				}
-				if (debugLevel >= 1) {
+				if (debuggingFlags > 0) {
 					sb.append("\n");
 				}
 			}
 		}
 		sb.append(decorationAfter);
+
+		if (debuggingFlags > 0) {
+			sb.append("\n");
+		}
 
 		return sb.toString();
 	}

@@ -10,12 +10,12 @@ package hextostring.evaluate;
 public interface Evaluator<O> {
 
 	/**
-	 * Provides a validity mark for a string.
+	 * Assigns a mark to an object, with all the evaluations details.
 	 *
 	 * @param o
-	 * 			The object to evaluate.
-	 * @return A validity mark for the object in parameter.
+	 * 			The object to be evaluated.
+	 * @return The result of the evaluation.
 	 */
-	int evaluate(O o);
+	EvaluationResult evaluate(O o);
 
 }

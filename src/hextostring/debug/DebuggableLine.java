@@ -1,6 +1,8 @@
 package hextostring.debug;
 
-import java.nio.charset.Charset;
+import hextostring.evaluate.EvaluationResult;
+import hextostring.utils.StringUtils;
+
 
 /**
  * Wraps all the necessary information to debug a line:
@@ -16,17 +18,14 @@ public class DebuggableLine {
 	private String readableString;
 	private String formattedString;
 
-	private Charset charset;
-
-	private int hexValidity;
-	private int readableStringValidity;
+	private EvaluationResult hexEvaluationResult;
+	private EvaluationResult readableStringEvaluationResult;
 
 	private String decorationBefore = "";
 	private String decorationAfter = "";
 
-	public DebuggableLine(String hex, Charset charset) {
+	public DebuggableLine(String hex) {
 		this.hex = hex;
-		this.charset = charset;
 	}
 
 	/**
@@ -55,6 +54,8 @@ public class DebuggableLine {
 	 */
 	public void setReadableString(String readableString) {
 		this.readableString = readableString;
+		// if no formatting is performed, formattedString = readableString
+		this.formattedString = readableString;
 	}
 
 	/**
@@ -77,59 +78,56 @@ public class DebuggableLine {
 	}
 
 	/**
-	 * Getter on the charset associated to the line.
+	 * Getter on the evaluation result of the hex chunk from which this line
+	 * originates.
 	 *
-	 * @return The charset associated to the line.
+	 * @return The evaluation result of the hex chunk from which this line
+	 * originates.
 	 */
-	public Charset getCharset() {
-		return charset;
+	public EvaluationResult getHexEvaluationResult() {
+		return hexEvaluationResult;
 	}
 
 	/**
-	 * Getter on the validity of this line.
+	 * Setter on the evaluation result of the hex chunk from which this line
+	 * originates.
 	 *
-	 * @return The validity of this line.
+	 * @param hexEvaluationResult
+	 * 			The new evaluation result of the hex chunk from which this line
+	 * 			originates.
+	 */
+	public void setHexEvaluationResult(EvaluationResult hexEvaluationResult) {
+		this.hexEvaluationResult = hexEvaluationResult;
+	}
+
+	/**
+	 * Getter on the evaluation result of the non-formatted string.
+	 *
+	 * @return The evaluation result of the non-formatted string.
+	 */
+	public EvaluationResult getReadableStringEvaluationResult() {
+		return readableStringEvaluationResult;
+	}
+
+	/**
+	 * Setter on the evaluation result of the non-formatted string.
+	 *
+	 * @param readableStringEvaluationResult
+	 * 			The new evaluation result of the non-formatted string.
+	 */
+	public void setReadableStringEvaluationResult(
+		EvaluationResult readableStringEvaluationResult) {
+		this.readableStringEvaluationResult = readableStringEvaluationResult;
+	}
+
+	/**
+	 * Convenience getter on the total validity of this line.
+	 *
+	 * @return The total validity of this line.
 	 */
 	public int getValidity() {
-		return hexValidity + readableStringValidity;
-	}
-
-	/**
-	 * Getter on the validity of the non-converted string.
-	 *
-	 * @return The validity of the non-converted string.
-	 */
-	public int getHexValidity() {
-		return hexValidity;
-	}
-
-	/**
-	 * Setter on the validity of the non-converted string.
-	 *
-	 * @param hexValidity
-	 * 			The new validity of the non-converted string.
-	 */
-	public void setHexValidity(int hexValidity) {
-		this.hexValidity = hexValidity;
-	}
-
-	/**
-	 * Getter on the validity of the converted string.
-	 *
-	 * @return The validity of the converted string.
-	 */
-	public int getReadableStringValidity() {
-		return readableStringValidity;
-	}
-
-	/**
-	 * Setter on the validity of the converted string.
-	 *
-	 * @param readableStringValidity
-	 * 			The new validity of the converted string.
-	 */
-	public void setReadableStringValidity(int readableStringValidity) {
-		this.readableStringValidity = readableStringValidity;
+		return this.hexEvaluationResult.getMark()
+			+ this.readableStringEvaluationResult.getMark();
 	}
 
 	/**
@@ -153,37 +151,60 @@ public class DebuggableLine {
 	}
 
 	/**
-	 * Formats this line depending on the debugging level.
+	 * Formats this line depending on the debugging flags.
 	 *
-	 * @param debugLevel
-	 * 			The debug level used to format this line.
+	 * @param debuggingFlags
+	 * 			The debugging flags used to format this line.
 	 * @return a string representing this line, with or without debug traces.
 	 */
-	public String toString(int debugLevel) {
+	public String toString(long debuggingFlags) {
 		StringBuilder sb = new StringBuilder();
 
-		if (debugLevel >= 1) {
+		if ((debuggingFlags & DebuggingFlags.LINE_HEX_INPUT) > 0) {
 			sb.append("hex: 0x" + hex + "\n");
 		}
-		if (debugLevel >= 4) {
-			sb.append("supposed encoding: " + charset + "\n");
-		}
-		if (debugLevel >= 2) {
-			sb.append(
-				"validity: " +
-				"(hex: " + hexValidity + ") + " +
-				"(str: " + readableStringValidity + ") = " +
-				getValidity() + "\n"
-			);
-		}
-		if (debugLevel >= 5) {
-			sb.append("non formatted: \n" + readableString + "\n");
-			sb.append("formatted: \n");
+
+		if ((debuggingFlags & DebuggingFlags.LINE_HEX_VALIDITY) > 0) {
+			sb.append("hex validity: " + hexEvaluationResult.getMark() + "\n");
+			if ((debuggingFlags
+				& DebuggingFlags.LINE_HEX_VALIDITY_DETAILS)
+				== DebuggingFlags.LINE_HEX_VALIDITY_DETAILS) {
+				sb.append("details: \n");
+				sb.append(StringUtils.indent(
+					hexEvaluationResult.getDetails(),
+					"\t",
+					1
+				) + "\n");
+			}
 		}
 
-		sb.append(decorationBefore);
-		sb.append(formattedString);
-		sb.append(decorationAfter);
+		if ((debuggingFlags & DebuggingFlags.LINE_STRING_VALIDITY) > 0) {
+			sb.append("string validity: ");
+			sb.append(readableStringEvaluationResult.getMark() + "\n");
+			if ((debuggingFlags
+				& DebuggingFlags.LINE_STRING_VALIDITY_DETAILS)
+				== DebuggingFlags.LINE_STRING_VALIDITY_DETAILS) {
+				sb.append("details: \n");
+				sb.append(StringUtils.indent(
+					readableStringEvaluationResult.getDetails(),
+					"\t",
+					1
+				) + "\n");
+			}
+		}
+
+		if ((debuggingFlags & DebuggingFlags.LINE_NON_FORMATTED) > 0) {
+			sb.append("non formatted: \n" + readableString + "\n");
+			sb.append("formatted: \n");
+		} else if (debuggingFlags > 0) {
+			sb.append("result: \n");
+		}
+
+		sb.append(StringUtils.indent(
+			decorationBefore + formattedString + decorationAfter,
+			"\t",
+			debuggingFlags > 0 ? 1 : 0
+		));
 
 		return sb.toString();
 	}

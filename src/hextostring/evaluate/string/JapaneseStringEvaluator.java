@@ -1,5 +1,9 @@
 package hextostring.evaluate.string;
 
+import hextostring.evaluate.EvaluationResult;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,12 +84,74 @@ public class JapaneseStringEvaluator extends ReadableStringEvaluator {
 	}
 
 	@Override
-	public int evaluate(String s) {
+	public EvaluationResult evaluate(String s) {
+		StringBuilder details = new StringBuilder();
+		List<Integer> points = new LinkedList<>();
+
+		int nbInvalidCharacters = getInvalidCharactersCount(s);
+		int nbPunctuation = getNbPunctuation(s);
+		boolean finalPunctuation = hasFinalPunctuation(s);
 		int nbKana = getNbKana(s);
-		return -getInvalidCharactersCount(s) * INVALID_CHARS_MALUS
-			+ getNbPunctuation(s) * PUNCTUATION_BONUS
-			+ (hasFinalPunctuation(s) ? FINAL_PUNCTUATION_BONUS : 0)
-			+ (nbKana == 0 ? - NO_KANA_MALUS : nbKana * KANA_BONUS);
+
+		details.append(nbInvalidCharacters);
+		details.append(" invalid characters; applying malus of ");
+		details.append(INVALID_CHARS_MALUS);
+		details.append(" for every invalid character: ");
+		points.add(-nbInvalidCharacters * INVALID_CHARS_MALUS);
+		details.append(points.get(points.size() - 1));
+
+		details.append("\n");
+
+		details.append(nbPunctuation);
+		details.append(" punctuation symbols; applying bonus of ");
+		details.append(PUNCTUATION_BONUS);
+		details.append(" for every punctuation symbol: +");
+		points.add(nbPunctuation * PUNCTUATION_BONUS);
+		details.append(points.get(points.size() - 1));
+
+		details.append("\n");
+
+		if (finalPunctuation) {
+			details.append("No final puncutation; no bonus applied");
+		} else {
+			details.append("Final punctuation detected");
+			details.append(" - applying malus of ");
+			details.append(FINAL_PUNCTUATION_BONUS);
+			details.append(" once: +");
+			points.add(FINAL_PUNCTUATION_BONUS);
+			details.append(points.get(points.size() - 1));
+		}
+
+		details.append("\n");
+
+		details.append(nbKana);
+		details.append(" kana(s); applying ");
+		if (nbKana == 0) {
+			details.append("malus of ");
+			details.append(NO_KANA_MALUS);
+			details.append(" once: -");
+			points.add(-NO_KANA_MALUS);
+		} else {
+			details.append("bonus of ");
+			details.append(KANA_BONUS);
+			details.append(" for every kana: +");
+			points.add(nbKana * KANA_BONUS);
+		}
+		details.append(points.get(points.size() - 1));
+
+		int mark = 0;
+		details.append("\nTotal: ");
+		for (Integer point : points) {
+			if(point >= 0) {
+				details.append("+");
+			}
+			details.append(point);
+			mark += point;
+		}
+		details.append("=");
+		details.append(mark);
+
+		return new EvaluationResult(mark, details.toString());
 	}
 
 }

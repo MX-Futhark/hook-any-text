@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author Maxime PIA
  */
-public class SJISConverter extends Converter {
+public class SJISConverter extends AbstractConverter {
 
 	public SJISConverter() {
 		super(Charsets.SHIFT_JIS);

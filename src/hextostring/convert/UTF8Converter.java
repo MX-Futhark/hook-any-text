@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author Maxime PIA
  */
-public class UTF8Converter extends Converter {
+public class UTF8Converter extends AbstractConverter {
 
 	public UTF8Converter() {
 		super(Charsets.UTF8);

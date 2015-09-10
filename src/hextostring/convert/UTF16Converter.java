@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author Maxime PIA
  */
-public class UTF16Converter extends Converter {
+public class UTF16Converter extends AbstractConverter {
 
 	public UTF16Converter(boolean bigEndian) {
 		super(bigEndian ? Charsets.UTF16_BE : Charsets.UTF16_LE);

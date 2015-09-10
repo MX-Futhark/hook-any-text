@@ -1,6 +1,7 @@
 package hextostring.evaluate.encoding;
 
 import hextostring.debug.DebuggableLineList;
+import hextostring.evaluate.EvaluationResult;
 import hextostring.evaluate.Evaluator;
 
 /**
@@ -15,8 +16,13 @@ public class EncodingEvaluator implements Evaluator<DebuggableLineList> {
 	public static int LINE_VALIDITY_THRESHOLD = 0;
 
 	@Override
-	public int evaluate(DebuggableLineList lines) {
-		return lines.getTotalReadableStringValidity(LINE_VALIDITY_THRESHOLD);
+	public EvaluationResult evaluate(DebuggableLineList lines) {
+		int mark =
+			lines.getTotalReadableStringValidity(LINE_VALIDITY_THRESHOLD);
+		String details =
+			"Total validity of readable strings for elements with validity > "
+			+ LINE_VALIDITY_THRESHOLD + " : " + mark;
+		return new EvaluationResult(mark, details);
 	}
 
 }

@@ -1,5 +1,6 @@
 package hextostring.evaluate.hex;
 
+import hextostring.evaluate.EvaluationResult;
 import hextostring.evaluate.Evaluator;
 
 /**
@@ -18,11 +19,31 @@ public abstract class HexStringEvaluator implements Evaluator<String> {
 	public static final int SMALL_LENGTH_MALUS = 24;
 
 	@Override
-	public int evaluate(String s) {
+	public EvaluationResult evaluate(String s) {
+		StringBuilder details = new StringBuilder();
+
 		int length = s.length();
-		return length <= SMALL_LENGTH_THRESHOLD
-			? -SMALL_LENGTH_MALUS
-			: length * HEX_LENGTH_VALIDITY_WEIGHT;
+		int mark = 0;
+
+		details.append("length=" + length);
+		if (length <= SMALL_LENGTH_THRESHOLD) {
+			details.append(", <= " + SMALL_LENGTH_THRESHOLD);
+			details.append("; applying malus of ");
+			details.append(SMALL_LENGTH_MALUS);
+			details.append(" once: ");
+			mark = -SMALL_LENGTH_MALUS;
+			details.append(mark);
+		} else {
+			details.append(", > " + SMALL_LENGTH_THRESHOLD);
+			details.append("; applying bonus of ");
+			details.append(HEX_LENGTH_VALIDITY_WEIGHT);
+			details.append(" for every character: +");
+			mark = length * HEX_LENGTH_VALIDITY_WEIGHT;
+			details.append(mark);
+		}
+		details.append("\nTotal: " + mark);
+
+		return new EvaluationResult(mark, details.toString());
 	}
 
 }

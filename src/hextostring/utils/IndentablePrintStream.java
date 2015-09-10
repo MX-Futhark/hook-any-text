@@ -1,7 +1,6 @@
 package hextostring.utils;
 
 import java.io.PrintStream;
-import java.util.Scanner;
 
 /**
  * Enables printing indented strings.
@@ -23,25 +22,7 @@ public class IndentablePrintStream {
 	}
 
 	private String indent(String s, int nbTabs) {
-		Scanner scanner = new Scanner(s);
-		StringBuilder tabsBuilder = new StringBuilder();
-		for (int i = 0; i < nbTabs; ++i) {
-			tabsBuilder.append(tab);
-		}
-		String tabs = tabsBuilder.toString();
-
-		StringBuilder indentedString = new StringBuilder();
-		while (scanner.hasNextLine()) {
-			indentedString.append(tabs);
-			indentedString.append(scanner.nextLine());
-			if (scanner.hasNextLine()) {
-				indentedString.append("\n");
-			}
-		}
-
-		scanner.close();
-
-		return indentedString.toString();
+		return StringUtils.indent(s, tab, nbTabs);
 	}
 
 	/**

@@ -4,7 +4,7 @@ import hextostring.Main;
 import hextostring.Options;
 import hextostring.convert.Converter;
 import hextostring.convert.ConverterFactory;
-import hextostring.debug.DebuggableLineList;
+import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
 import hextostring.utils.Charsets;
@@ -91,10 +91,10 @@ public class TestsLauncher {
 					Charsets.UTF8
 				);
 
-				DebuggableLineList dInput = currentConverter.convert(input);
-				formatter.format(dInput);
+				DebuggableStrings dInput = currentConverter.convert(input);
+				formatter.format(dInput.getValidLineList());
 				String actualOutput = dInput.toString(
-					Options.DEFAULT_DEBUG_LEVEL,
+					Options.DEFAULT_DEBUGGING_FLAGS,
 					Options.DEFAULT_STRICTNESS
 				);
 				out.print(inputs[i].getName(), indentLevel);
