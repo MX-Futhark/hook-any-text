@@ -74,6 +74,41 @@ public class TestsLauncher {
 		return files;
 	}
 
+	private static void compare(File inputFile, File expectedOutputFile,
+		int indentLevel) {
+
+		try {
+			String input = new String(
+				Files.readAllBytes(inputFile.toPath()),
+				Charsets.UTF8
+			);
+			String expectedOutput = new String(
+				Files.readAllBytes(expectedOutputFile.toPath()),
+				Charsets.UTF8
+			);
+
+			DebuggableStrings dInput = currentConverter.convert(input);
+			formatter.format(dInput.getValidLineList());
+			String actualOutput = dInput.toString(
+				Options.DEFAULT_DEBUGGING_FLAGS,
+				Options.DEFAULT_STRICTNESS
+			);
+			out.print(inputFile.getName(), indentLevel);
+
+			if (expectedOutput.equals(actualOutput)) {
+				out.println(" OK");
+			} else {
+				out.println(" FAILURE");
+				out.println("expected:", indentLevel + 1);
+				out.println(expectedOutput, indentLevel + 2);
+				out.println("instead of:", indentLevel + 1);
+				out.println(actualOutput, indentLevel + 2);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private static void compareAll(File inputDirectory,
 		File expectedOutputDirectory, int indentLevel) {
 
@@ -81,36 +116,31 @@ public class TestsLauncher {
 		File[] expectedOutputs = listSortedFiles(expectedOutputDirectory);
 
 		for (int i = 0; i < inputs.length && i < expectedOutputs.length; ++i) {
-			try {
-				String input = new String(
-					Files.readAllBytes(inputs[i].toPath()),
-					Charsets.UTF8
-				);
-				String expectedOutput = new String(
-					Files.readAllBytes(expectedOutputs[i].toPath()),
-					Charsets.UTF8
-				);
+			compare(inputs[i], expectedOutputs[i], indentLevel);
+		}
+	}
 
-				DebuggableStrings dInput = currentConverter.convert(input);
-				formatter.format(dInput.getValidLineList());
-				String actualOutput = dInput.toString(
-					Options.DEFAULT_DEBUGGING_FLAGS,
-					Options.DEFAULT_STRICTNESS
-				);
-				out.print(inputs[i].getName(), indentLevel);
+	private static boolean isEncoding(File f, String encodingName) {
+		return f.getName().equals(encodingName)
+			|| isEncoding(f.getParentFile(), encodingName);
+	}
 
-				if (expectedOutput.equals(actualOutput)) {
-					out.println(" OK");
-				} else {
-					out.println(" FAILURE");
-					out.println("expected:", indentLevel + 1);
-					out.println(expectedOutput, indentLevel + 2);
-					out.println("instead of:", indentLevel + 1);
-					out.println(actualOutput, indentLevel + 2);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	private static void setEncoding(File f, boolean detectEncoding) {
+		if (detectEncoding) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.DETECT);
+		} else if (isEncoding(f, "sjis")) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS);
+		} else if (isEncoding(f, "utf16-be")) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.UTF16_BE);
+		} else if (isEncoding(f, "utf16-le")) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.UTF16_LE);
+		} else if (isEncoding(f, "utf8")) {
+			currentConverter =
+				ConverterFactory.getConverterInstance(Charsets.UTF8);
 		}
 	}
 
@@ -119,22 +149,7 @@ public class TestsLauncher {
 
 		out.println(f.getName(), indentLevel);
 
-		if (detectEncoding) {
-			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.DETECT);
-		} else if (f.getName().equals("sjis")) {
-			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS);
-		} else if (f.getName().equals("utf16-be")) {
-			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF16_BE);
-		} else if (f.getName().equals("utf16-le")) {
-			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF16_LE);
-		} else if (f.getName().equals("utf8")) {
-			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF8);
-		}
+		setEncoding(f, detectEncoding);
 
 		if (f.isDirectory()) {
 			File[] files = listSortedFiles(f);
@@ -156,20 +171,57 @@ public class TestsLauncher {
 		}
 	}
 
+	private static final String NODETECT_MSG = "Without encoding detection:\n";
+	private static final String DETECT_MSG = "With encoding detection:\n";
+	private static final String SEPARATOR = "\n----------\n\n";
+
+	private static void goThrough(String path) {
+		File f = new File(path);
+		out.println(NODETECT_MSG);
+		goThrough(f, 0, false);
+		out.println(SEPARATOR + DETECT_MSG);
+		goThrough(f, 0, true);
+	}
+
+	private static void compare(String inputPath, String expectedOutputPath) {
+		File input = new File(inputPath);
+		if (!input.isFile()) {
+			throw new IllegalArgumentException(
+				input.getPath() + " doesn't exist."
+			);
+		}
+		File expectedOutput = new File(expectedOutputPath);
+		out.println(NODETECT_MSG);
+		setEncoding(input.getParentFile(), false);
+		compare(input, expectedOutput, 0 );
+		out.println(SEPARATOR + DETECT_MSG);
+		setEncoding(input.getParentFile(), true);
+		compare(input, expectedOutput, 0 );
+	}
+
 	/**
 	 * Starts the test campaign.
 	 *
 	 * @param args
-	 * 			See {@link hextostring.Options options}
+	 * 			args[0] = directory to test, without initial an final "/"
+	 * 			args[1] = number identifying a test, without ".txt" (optional)
 	 */
 	public static void main(String[] args) {
 		URL currentURL =
 			Main.class.getProtectionDomain().getCodeSource().getLocation();
-		File f = new File(currentURL.getPath() + "../tests");
-		out.println("Without encoding detection:\n");
-		goThrough(f, 0, false);
-		out.println("\n----------\n\nWith encoding detection:\n");
-		goThrough(f, 0, true);
+		String currentpath = currentURL.getPath() + "../tests/";
+		if (args.length > 0) {
+			String directory = currentpath + args[0];
+			if (args.length > 1) {
+				String testId = args[1];
+				compare(directory + "/input/" + testId + ".txt",
+					directory + "/expected_output/" + testId + ".txt");
+			} else {
+				goThrough(directory);
+			}
+		} else {
+			goThrough(currentpath);
+		}
 	}
 
 }
