@@ -111,11 +111,11 @@ public class JapaneseStringEvaluator extends ReadableStringEvaluator {
 
 		details.append("\n");
 
-		if (finalPunctuation) {
-			details.append("No final puncutation; no bonus applied");
+		if (!finalPunctuation) {
+			details.append("No final punctuation; no bonus applied");
 		} else {
 			details.append("Final punctuation detected");
-			details.append(" - applying malus of ");
+			details.append(" - applying bonus of ");
 			details.append(FINAL_PUNCTUATION_BONUS);
 			details.append(" once: +");
 			points.add(FINAL_PUNCTUATION_BONUS);
