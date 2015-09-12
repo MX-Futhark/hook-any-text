@@ -1,11 +1,11 @@
 package hextostring.evaluate.string;
 
-import hextostring.evaluate.EvaluationResult;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import hextostring.evaluate.EvaluationResult;
 
 /**
  * Standard evaluator for Japanese strings.
@@ -129,7 +129,7 @@ public class JapaneseStringEvaluator extends ReadableStringEvaluator {
 		if (nbKana == 0) {
 			details.append("malus of ");
 			details.append(NO_KANA_MALUS);
-			details.append(" once: -");
+			details.append(" once: ");
 			points.add(-NO_KANA_MALUS);
 		} else {
 			details.append("bonus of ");
