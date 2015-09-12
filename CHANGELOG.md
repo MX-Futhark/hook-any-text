@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 0.5.0 - 2015-12-09
+- Replaced debugging levels by debugging flags.
+
 ## 0.4.1 - 2015-29-08
 - Fixed #2
 - Fixed #3
