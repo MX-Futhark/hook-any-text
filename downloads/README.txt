@@ -114,9 +114,12 @@
   Changelog
   ---------
 
+  0.5.0 - 2015-12-09
+   - Replaced debugging levels by debugging flags.
+
   0.4.1 - 2015-29-08
-   - Fixed rejection of valid Shift-JIS strings
-   - Added input preprocessing before encoding recognition
+   - Fixed rejection of valid Shift-JIS strings.
+   - Added input preprocessing before encoding recognition.
 
   0.4.0 - 2015-16-08
    - Added encoding recognition.
