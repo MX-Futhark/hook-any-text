@@ -1,5 +1,17 @@
 package hextostring.tests;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import hextostring.Main;
 import hextostring.Options;
 import hextostring.convert.Converter;
@@ -9,16 +21,6 @@ import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
 import hextostring.utils.Charsets;
 import hextostring.utils.IndentablePrintStream;
-
-import java.io.File;
-import java.net.URL;
-import java.nio.file.Files;
-import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Main test class.
@@ -67,11 +69,12 @@ import java.util.Map;
  * @author Maxime PIA
  */
 public class TestsLauncher {
-
 	private static Formatter formatter =
 		FormatterFactory.getFormatterInstance(true);
 	private static Converter currentConverter;
 	private static IndentablePrintStream out = new IndentablePrintStream();
+
+	private static Logger logger = LogManager.getLogger(TestsLauncher.class);
 
 	private static File[] listSortedFiles(File f) {
 		File[] files = f.listFiles();
@@ -81,7 +84,6 @@ public class TestsLauncher {
 
 	private static boolean compare(File inputFile, File expectedOutputFile,
 		int indentLevel) {
-
 		try {
 			String input = new String(
 				Files.readAllBytes(inputFile.toPath()),
@@ -252,11 +254,10 @@ public class TestsLauncher {
 	 * 			args[1] = number identifying a test, without ".txt" (optional)
 	 */
 	public static void main(String[] args) {
-		URL currentURL =
-			Main.class.getProtectionDomain().getCodeSource().getLocation();
-		String currentpath = currentURL.getPath() + "../tests/";
+		logger.info("Starting conversion tests...");
+		String testsDirectory = Main.getResourcePath(true, "tests/");
 		if (args.length > 0) {
-			String directory = currentpath + args[0];
+			String directory = testsDirectory + args[0];
 			if (args.length > 1) {
 				String testId = args[1];
 				compare(directory + "/input/" + testId + ".txt",
@@ -265,8 +266,9 @@ public class TestsLauncher {
 				goThrough(directory);
 			}
 		} else {
-			goThrough(currentpath);
+			goThrough(testsDirectory);
 		}
+		logger.info("Conversion tests over.");
 	}
 
 }

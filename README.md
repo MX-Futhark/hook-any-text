@@ -18,11 +18,17 @@ Once this is done, read LICENSE (TL;DR: MIT License. If you're going to use stuf
 Then, here are some more stuff for you:
 
 
-### Build intructions
+### Build instructions
 
 I recommend Eclipse or Netbeans to use with this project.  
 The entry point of the main program is hextostring.Main. Change command line options as necessary in your run configurations.  
-The entry point of the test program is hextostring.tests.TestLauncher. Command line options will not be taken into account.
+The entry point of the test program is hextostring.tests.TestsLauncher. Command line options can be used to restrict the tests to be run.  
+
+
+I would recommend creating the following run configuration for building and testing the project (In Eclipse Mars):
+
+1. Right click on the project -> Run As -> Maven build...
+2. Type the following content in "Goals": clean install test-compile -DskipTests exec:java -Dexec.mainClass=hextostring.tests.TestsLauncher -Dexec.classpathScope="test"
 
 
 ### How it works
@@ -33,8 +39,8 @@ Changes in the selected zone cause the hexadecimal data to be piped into a proce
 
 ### General organization
 
-The Lua file (automatically run when Cheat Engine is started) is placed in the lua directory.  
-The actual conversion of hexadecimal strings is done in Java, and goes into the src directory.
+This project uses Maven and respects the usual conventions of a Maven project.  
+The Lua file (automatically run when Cheat Engine is started) is placed in src/main/lua.  
 
 The conversion is not done directly in lua because:
 

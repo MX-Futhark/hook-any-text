@@ -1,14 +1,13 @@
 package hextostring;
 
-import hextostring.debug.DebuggingFlags;
-import hextostring.utils.Charsets;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.Charset;
+
+import hextostring.debug.DebuggingFlags;
+import hextostring.utils.Charsets;
 
 /**
  * Options for string conversion.
@@ -148,10 +147,7 @@ public class Options {
 			usage.append("\n\nPlease use the following options:\n\n");
 		}
 
-		URL currentURL =
-			Main.class.getProtectionDomain().getCodeSource().getLocation();
-		File f =
-			new File(currentURL.getPath() + "../resources/usage_message.txt");
+		File f = new File(Main.getResourcePath(false, "usage_message.txt"));
 
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(f));
