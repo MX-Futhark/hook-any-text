@@ -74,7 +74,7 @@ public class JapaneseStringEvaluator extends ReadableStringEvaluator {
 
 		for (int i = 0; i < s.length(); ++i) {
 			for (String punctuation : JAPANESE_PUNCTUATION) {
-				if (punctuation.equals(s.charAt(i))) {
+				if ((s.charAt(i) + "").matches(punctuation)) {
 					++total;
 					break;
 				}
