@@ -99,6 +99,8 @@ function convertHexSelection(threadObj)
 		closeCE()
 	end
 
+	local previousBytes = {}
+
 	while true do
 
 		if hexView.hasSelection then
@@ -108,13 +110,17 @@ function convertHexSelection(threadObj)
 				selectionSize + 1,
 				true
 			))
-			if bytes ~= nil then
+			if bytes ~= nil
+				and countDifferences({previousBytes, bytes})
+					> table.getn(bytes) * STABILIZATION_THRESHOLD
+			then
 				local s = ""
 				for i = 1, table.getn(bytes) do
 					s = s .. string.format("%02x", bytes[i])
 				end
 				handle:write(s .. "\n")
 				handle:flush()
+				previousBytes = bytes
 			end
 		end
 
