@@ -23,7 +23,8 @@ public abstract class HexStringEvaluator implements Evaluator<String> {
 		StringBuilder details = new StringBuilder();
 
 		int length = s.length();
-		int mark = 0;
+		int points = 0;
+		int total = 0;
 
 		details.append("length=" + length);
 		if (length <= SMALL_LENGTH_THRESHOLD) {
@@ -31,19 +32,21 @@ public abstract class HexStringEvaluator implements Evaluator<String> {
 			details.append("; applying malus of ");
 			details.append(SMALL_LENGTH_MALUS);
 			details.append(" once: ");
-			mark = -SMALL_LENGTH_MALUS;
-			details.append(mark);
+			points = -SMALL_LENGTH_MALUS;
+			details.append(points);
+			total += points;
 		} else {
 			details.append(", > " + SMALL_LENGTH_THRESHOLD);
 			details.append("; applying bonus of ");
 			details.append(HEX_LENGTH_VALIDITY_WEIGHT);
 			details.append(" for every character: +");
-			mark = length * HEX_LENGTH_VALIDITY_WEIGHT;
-			details.append(mark);
+			points = length * HEX_LENGTH_VALIDITY_WEIGHT;
+			details.append(points);
+			total += points;
 		}
-		details.append("\nTotal: " + mark);
+		details.append("\nTotal: " + total);
 
-		return new EvaluationResult(mark, details.toString());
+		return new EvaluationResult(total, details.toString());
 	}
 
 }
