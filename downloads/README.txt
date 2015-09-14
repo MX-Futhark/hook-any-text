@@ -114,6 +114,11 @@
   Changelog
   ---------
 
+  0.5.1 - 2015-14-09
+   - Fixed incorrect string evaluation.
+   - Added configuration variables to adjust the hexadecimal selection
+     conversion method.
+
   0.5.0 - 2015-12-09
    - Replaced debugging levels by debugging flags.
 
