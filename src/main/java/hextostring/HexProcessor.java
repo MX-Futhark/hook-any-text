@@ -1,14 +1,14 @@
 package hextostring;
 
+import java.io.PrintStream;
+import java.util.Scanner;
+
 import hextostring.convert.Converter;
 import hextostring.convert.ConverterFactory;
 import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
 import hextostring.utils.Clipboard;
-
-import java.io.PrintStream;
-import java.util.Scanner;
 
 /**
  * Full conversion chain for an arbitrary number of input strings.
@@ -48,7 +48,7 @@ public class HexProcessor {
 
 		while (true) {
 			try {
-				hex = sc.next();
+				hex = sc.nextLine();
 				if (hex.contains("exit")) {
 					break;
 				}

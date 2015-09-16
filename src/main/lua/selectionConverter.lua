@@ -91,9 +91,14 @@ function convertHexSelection(threadObj)
 		return bytes
 	end
 
+	sendText = function(cmdOrHex)
+		handle:write(cmdOrHex .. "\n")
+		handle:flush()
+	end
+
 	getMainForm().OnClose = function(sender)
 		pcall(function()
-			handle:write("exit")
+			sendText("exit")
 			handle:close()
 		end)
 		closeCE()
@@ -118,8 +123,7 @@ function convertHexSelection(threadObj)
 				for i = 1, table.getn(bytes) do
 					s = s .. string.format("%02x", bytes[i])
 				end
-				handle:write(s .. "\n")
-				handle:flush()
+				sendText(s)
 				previousBytes = bytes
 			end
 		end
