@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>HookAnyText</groupId>
   <artifactId>HookAnyText</artifactId>
-  <version>0.5.1</version>
+  <version>0.6.0</version>
   <name>HookAnyText</name>
   <description>The goal of this project is to provide an alternative to well established text hookers, whose features are restrained to a certain number of game engines and emulators.</description>
   <properties>
@@ -25,7 +25,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>hextostring.Main</mainClass>
+              <mainClass>main.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -43,5 +43,15 @@
         </executions>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 </project>

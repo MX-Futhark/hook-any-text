@@ -1,8 +1,8 @@
 package hextostring.convert;
 
-import hextostring.utils.Charsets;
-
 import java.nio.charset.Charset;
+
+import hextostring.utils.Charsets;
 
 /**
  * Determine which converter to provide.

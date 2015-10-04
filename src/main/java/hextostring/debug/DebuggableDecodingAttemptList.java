@@ -54,7 +54,7 @@ public class DebuggableDecodingAttemptList implements DebuggableStrings {
 			}
 		}
 
-		return sb.toString();
+		return sb.toString().trim();
 	}
 
 }

@@ -1,5 +1,7 @@
 package hextostring.evaluate;
 
+import java.nio.charset.Charset;
+
 import hextostring.evaluate.encoding.EncodingEvaluator;
 import hextostring.evaluate.hex.HexStringEvaluator;
 import hextostring.evaluate.hex.SJISHexStringEvaluator;
@@ -8,8 +10,6 @@ import hextostring.evaluate.hex.UTF8HexStringEvaluator;
 import hextostring.evaluate.string.JapaneseStringEvaluator;
 import hextostring.evaluate.string.ReadableStringEvaluator;
 import hextostring.utils.Charsets;
-
-import java.nio.charset.Charset;
 
 /**
  * Determines which evaluator to provide.

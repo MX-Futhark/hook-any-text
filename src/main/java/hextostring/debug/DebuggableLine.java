@@ -1,7 +1,7 @@
 package hextostring.debug;
 
 import hextostring.evaluate.EvaluationResult;
-import hextostring.utils.StringUtils;
+import main.utils.StringUtils;
 
 
 /**

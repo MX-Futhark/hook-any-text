@@ -1,0 +1,2 @@
+version=${project.version}
+website=http://mx-futhark.github.io/hook-any-text/

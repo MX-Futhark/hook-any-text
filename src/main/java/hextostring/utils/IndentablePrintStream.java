@@ -2,6 +2,8 @@ package hextostring.utils;
 
 import java.io.PrintStream;
 
+import main.utils.StringUtils;
+
 /**
  * Enables printing indented strings.
  *

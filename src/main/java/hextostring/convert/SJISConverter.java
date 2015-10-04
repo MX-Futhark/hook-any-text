@@ -1,11 +1,11 @@
 package hextostring.convert;
 
-import hextostring.utils.Charsets;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import hextostring.utils.Charsets;
 
 /**
  * Standard converter for Shift-JIS-encoded hexadecimal strings.

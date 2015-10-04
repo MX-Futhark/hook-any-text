@@ -14,8 +14,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import hextostring.Main;
-import hextostring.Options;
+import hextostring.ConvertOptions;
 import hextostring.convert.Converter;
 import hextostring.convert.ConverterFactory;
 import hextostring.debug.DebuggableStrings;
@@ -99,8 +98,8 @@ public class TestsLauncher {
 			DebuggableStrings dInput = currentConverter.convert(input);
 			formatter.format(dInput.getValidLineList());
 			String actualOutput = dInput.toString(
-				Options.DEFAULT_DEBUGGING_FLAGS,
-				Options.DEFAULT_STRICTNESS
+				ConvertOptions.DEFAULT_DEBUGGING_FLAGS,
+				ConvertOptions.DEFAULT_STRICTNESS
 			);
 			out.print(inputFile.getName(), indentLevel);
 
@@ -258,7 +257,8 @@ public class TestsLauncher {
 	 */
 	public static void main(String[] args) {
 		logger.info("Starting conversion tests...");
-		String testsDirectory = Main.getResourcePath(true, "tests/");
+		String testsDirectory =
+			TestsLauncher.class.getResource("/tests").getPath();
 		if (args.length > 0) {
 			String directory = testsDirectory + args[0];
 			if (args.length > 1) {

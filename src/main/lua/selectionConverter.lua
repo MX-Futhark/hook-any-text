@@ -1,120 +1,75 @@
+STRATEGIES = {
+	stabilized = 2 ^ 0,
+	recurring = 2 ^ 1
+}
+
+CONFIG_FILEPATH = (os.getenv("TMP") or os.getenv("TEMP")
+	or error("Could not find a temporary directory.")
+) .. "\\HookAnyText\\hex_config"
+
+HAT_IS_RUNNING = true
+
+HAT_MENU_ITEM = nil
+
+-- main hex capture function
 function convertHexSelection(threadObj)
 
-	local STRATEGIES = {
-		stabilized = 2 ^ 0,
-		recurring = 2 ^ 1
-	}
-
-	-- definition: Determines the encoding used to decode the selection.
-	-- domain: among detect, sjis, utf16-be, utf16-le, utf8
-	local ENCODING = "detect"
-
-	-- definition: Filters converted strings deemed to be garbage.
-	--     The lower the value, the more garbage there is.
-	--     The higher the value, the higher the chance to filter actual text.
-	-- domain: any positive or negative integer
-	local STRICTNESS = 20
-
-	-- definition: Determines at which proportion of the size of the selection
-	--     the number of differences between the current content of the
-	--     selection and that of the history is deemed low enough to convert
-	--     the selection.
-	-- domain: a real number between 0 and 1
-	local STABILIZATION_THRESHOLD = 0.005
-
-	-- definition: The number of ms to wait before capturing the selection.
-	-- domain: a positive integer
-	local REFRESH_DELAY = 50
-
-	-- definition: The length of the array containing the previous selections.
-	-- domain: a strictly positive integer
-	local HISTORY_SIZE = 6
-
-	-- definition: The strategy to use to deem the selection worthy of being
-	--     converted.
-	--     STRATEGIES.stabilized waits for the content of the selection to be
-	--       stable enough, relative to STABILIZATION_THRESHOLD, to convert
-	--       the selection. The whole history is used to compute the
-	--       stabilization factor. The bigger the history, the longer the wait
-	--       for converting the selection.
-	--     STRATEGIES.recurring does not convert the selection directly, but
-	--       an array of bytes constructed from the most common bytes at
-	--       every position of the elements in the history.
-	--     STRATEGIES.stabilized + STRATEGIES.recurring combines the two.
-	--     NOTE: if HISTORY_SIZE == 1, the selection is immediatly converted
-	--       every REFRESH_DELAY ms no matter the strategy.
-	-- domain: STRATEGIES.stabilized, STRATEGIES.recurring or the sum of the two
-	local UPDATE_STRATEGY = STRATEGIES.stabilized + STRATEGIES.recurring
+	os.remove(CONFIG_FILEPATH)
 
 	local hexView = getMemoryViewForm().HexadecimalView
 	local history = {}
 	local recurringHistory = {}
 	local handle = io.popen(
-		"java.exe -jar \"" .. getCheatEngineDir() ..
-		"autorun\\HexToString.jar\" " ..
-		"--encoding=" .. ENCODING .. " --strictness=" .. STRICTNESS,
+		"java.exe -jar \"" .. getCheatEngineDir()
+			.. "autorun\\HexToString.jar\" ",
 		"w"
 	)
+	HAT_IS_RUNNING = true
 	local selectionSize = 0
+	local previousBytes = {}
 
-	-- determines whether it's worth converting the selection or not
-	-- returns nil if not
-	-- returns the array of bytes to use otherwise
-	getBytes = function(selectionContent)
 
-		if selectionContent == nil then
-			return nil
-		end
-
-		pushFirst(history, selectionContent, HISTORY_SIZE)
-		local bytes = selectionContent
-		if band(UPDATE_STRATEGY, STRATEGIES.recurring, 8) > 0 then
-			bytes = constructHexFromHistory(history)
-			pushFirst(recurringHistory, bytes, HISTORY_SIZE)
-		end
-
-		if band(UPDATE_STRATEGY, STRATEGIES.stabilized, 8) > 0 then
-			local differences = 0
-			if band(UPDATE_STRATEGY, STRATEGIES.recurring, 8) > 0 then
-				differences = countDifferences(recurringHistory)
-			else
-				differences = countDifferences(history)
-			end
-
-			if differences < table.getn(bytes) * STABILIZATION_THRESHOLD then
-				return bytes
-			else
-				return nil
-			end
-		end
-
-		return bytes
-	end
-
-	sendText = function(cmdOrHex)
+	local sendText = function(cmdOrHex)
 		handle:write(cmdOrHex .. "\n")
 		handle:flush()
 	end
 
 	getMainForm().OnClose = function(sender)
 		pcall(function()
-			sendText("exit")
+			sendText(":exit")
 			handle:close()
 		end)
 		closeCE()
 	end
 
-	local previousBytes = {}
+	HAT_MENU_ITEM.OnClick = function(sender)
+		if HAT_IS_RUNNING then
+			sendText(":focus")
+		else
+			createNativeThread(convertHexSelection)
+			HAT_IS_RUNNING = true
+		end
+	end
+
 
 	while true do
 
+		sleep(REFRESH_DELAY)
+		if checkConfigurationUpdates() then
+			setConfiguration()
+		end
+
+		if not HAT_IS_RUNNING then
+			break
+		end
+
 		if hexView.hasSelection then
 			selectionSize = hexView.SelectionStop-hexView.SelectionStart
-			local bytes = getBytes(readBytes(
-				hexView.SelectionStart,
-				selectionSize + 1,
-				true
-			))
+			local bytes = getBytes(
+				readBytes(hexView.SelectionStart, selectionSize + 1, true),
+				history,
+				recurringHistory
+			)
 			if bytes ~= nil
 				and countDifferences({previousBytes, bytes})
 					> table.getn(bytes) * STABILIZATION_THRESHOLD
@@ -128,12 +83,43 @@ function convertHexSelection(threadObj)
 			end
 		end
 
-		sleep(REFRESH_DELAY)
-
 	end
 
 end
 
+-- determines whether it's worth converting the selection or not
+-- returns nil if not
+-- returns the array of bytes to use otherwise
+function getBytes(selectionContent, history, recurringHistory)
+
+	if selectionContent == nil then
+		return nil
+	end
+
+	pushFirst(history, selectionContent, HISTORY_SIZE)
+	local bytes = selectionContent
+	if band(UPDATE_STRATEGY, STRATEGIES.recurring, 8) > 0 then
+		bytes = constructHexFromHistory(history)
+		pushFirst(recurringHistory, bytes, HISTORY_SIZE)
+	end
+
+	if band(UPDATE_STRATEGY, STRATEGIES.stabilized, 8) > 0 then
+		local differences = 0
+		if band(UPDATE_STRATEGY, STRATEGIES.recurring, 8) > 0 then
+			differences = countDifferences(recurringHistory)
+		else
+			differences = countDifferences(history)
+		end
+
+		if differences > table.getn(bytes) * STABILIZATION_THRESHOLD then
+			return nil
+		end
+	end
+
+	return bytes
+end
+
+-- gets the minimum size of an array in a list
 function getMinSize(tables)
 	if tables == nil or table.getn(tables) == 0 then
 		return 0
@@ -147,6 +133,7 @@ function getMinSize(tables)
 	return minSize
 end
 
+-- count the number of different elements between arrays
 function countDifferences(tables)
 	local differenceCounter = 0;
 	for i = 1, table.getn(tables) - 1 do
@@ -203,12 +190,95 @@ function constructHexFromHistory(history)
 	return res
 end
 
+-- pushes an elements at the first place of an array
 function pushFirst(array, elt, maxSize)
 	table.insert(array, 1, elt)
-	if table.getn(array) > maxSize then
+	while table.getn(array) > maxSize do
 		table.remove(array, maxSize + 1)
 	end
 end
 
+-- sets the value of a global variable from its name
+-- taken from the official documentation
+function setfield(f, v)
+	local t = _G
+	for w, d in string.gfind(f, "([%w_]+)(.?)") do
+		if d == "." then
+			t[w] = t[w] or {}
+			t = t[w]
+		else
+			t[w] = v
+		end
+	end
+end
 
+-- sets configuration variables
+function setConfiguration()
+	local f = nil
+	local nbTries = 0
+	while f == nil and nbTries < 30 do
+		nbTries = nbTries + 1
+		f = io.open(CONFIG_FILEPATH, "r")
+		sleep(200)
+	end
+	if nbTries >= 50 and f == nil then
+		error("Could not open temporary configuration update file.")
+	end
+
+	local keyValueCouples = f:read("*all")
+	for k, v in string.gmatch(keyValueCouples, "([%w_]+)=([%w_]+)") do
+		setfield(k, tonumber(v) or strtobool(v))
+	end
+
+	f:close()
+	os.remove(CONFIG_FILEPATH)
+	translateStrategy()
+end
+
+-- interprets "true" and "false" to true and false respectively
+-- returns str if any other value
+function strtobool(str)
+	if str == "true" then
+		return true
+	elseif str == "false" then
+		return false
+	end
+	return str
+end
+
+-- translates the name of an update strategy into a usable value
+function translateStrategy()
+	if UPDATE_STRATEGY == "basic" then
+		HISTORY_SIZE = 1
+		STABILIZATION_THRESHOLD = 0
+		UPDATE_STRATEGY = STRATEGIES.stabilized
+	elseif UPDATE_STRATEGY == "stabilized" then
+		UPDATE_STRATEGY = STRATEGIES.stabilized
+	elseif UPDATE_STRATEGY == "recurring" then
+		UPDATE_STRATEGY = STRATEGIES.recurring
+	elseif UPDATE_STRATEGY == "combined" then
+		UPDATE_STRATEGY = STRATEGIES.stabilized + STRATEGIES.recurring
+	end
+end
+
+-- checks for an update in configuration
+function checkConfigurationUpdates()
+	local f = io.open(CONFIG_FILEPATH,"r")
+	if f ~= nil then
+		f:close()
+		return true
+	else
+		return false
+	end
+end
+
+-- creates a menu item for HAT in CE's main form's "File" menu
+function addHATMenuItem()
+	local fileMenu = getMainForm().Menu.Items[0]
+	HAT_MENU_ITEM = createMenuItem(fileMenu) 
+	HAT_MENU_ITEM.Caption = "Hook Any Text"
+	fileMenu.insert(0, HAT_MENU_ITEM)
+end
+
+addHATMenuItem()
 createNativeThread(convertHexSelection)

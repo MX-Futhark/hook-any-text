@@ -1,13 +1,11 @@
 package hextostring;
 
-import java.io.PrintStream;
-import java.util.Scanner;
-
 import hextostring.convert.Converter;
 import hextostring.convert.ConverterFactory;
 import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
+import hextostring.history.History;
 import hextostring.utils.Clipboard;
 
 /**
@@ -21,63 +19,48 @@ public class HexProcessor {
 	// This field is used to avoid flooding the clipboard.
 	private String previousResult = "";
 
-	private void print(String message, PrintStream out) {
-		if (out != null) {
-			out.println(message);
-		}
+	private History history;
+	private ConvertOptions opts;
+
+	private Formatter formatter = FormatterFactory.getFormatterInstance(false);
+
+	public HexProcessor(ConvertOptions opts, History history) {
+		this.history = history;
+		this.opts = opts;
 	}
 
 	/**
-	 * Starts a conversion session.
-	 * Hex strings are read from System.in, and may be piped into the program.
-	 * Writing the string "exit" will cause the program to exit.
+	 * Converts an hexadecimal string into a readable string.
 	 *
-	 * @param opts
-	 * 			Options for the session.
-	 * @param out
-	 * 			A stream to display converted strings and error messages.
-	 * 			May be null.
+	 * @param hex
+	 * 			The hexadecimal string.
+	 * @param forceUpdate
+	 * 			True if to the current value even if it is not warranted.
+	 * @return The converted string.
 	 */
-	public void start(Options opts, PrintStream out) {
-		Scanner sc = new Scanner(System.in);
-		String hex, result;
-
+	public synchronized String convert(String hex, boolean forceUpdate) {
 		Converter converter =
 			ConverterFactory.getConverterInstance(opts.getCharset());
-		Formatter formatter = FormatterFactory.getFormatterInstance(false);
+		DebuggableStrings ds = converter.convert(hex);
+		formatter.format(ds.getValidLineList());
+		String result = ds.toString(
+			opts.getDebuggingFlags(),
+			opts.getStrictness()
+		);
+		// avoid unnecessarily updating the clipboard
+		if ((!result.equals(previousResult) && result.length() > 0)
+			|| forceUpdate) {
 
-		while (true) {
-			try {
-				hex = sc.nextLine();
-				if (hex.contains("exit")) {
-					break;
-				}
-
-				DebuggableStrings dInput = converter.convert(hex);
-				formatter.format(dInput.getValidLineList());
-				result = dInput.toString(
-					opts.getDebuggingFlags(),
-					opts.getStrictness()
-				);
-
-				// avoid unnecessarily updating the clipboard
-				if (!result.equals(previousResult)) {
-					if(opts.getDebuggingFlags() > 0) {
-						print(result, out);
-					}
-					Clipboard.set(result);
-					previousResult = result;
-				}
-			} catch (Exception e) {
-				if (opts.getDebuggingFlags() > 0) {
-					e.printStackTrace();
-				} else {
-					print(e.getMessage(), out);
-				}
+			history.add(hex, result);
+			if (opts.isAutocopy()) {
+				Clipboard.set(result);
 			}
+			previousResult = result;
+
+			return result;
 		}
 
-		sc.close();
+		return null;
 	}
 
 }

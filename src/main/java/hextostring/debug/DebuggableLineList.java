@@ -208,7 +208,7 @@ public class DebuggableLineList implements DebuggableStrings {
 			sb.append("\n");
 		}
 
-		return sb.toString();
+		return sb.toString().trim();
 	}
 
 }
