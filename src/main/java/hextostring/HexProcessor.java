@@ -39,8 +39,10 @@ public class HexProcessor {
 	 * @return The converted string.
 	 */
 	public synchronized String convert(String hex, boolean forceUpdate) {
-		Converter converter =
-			ConverterFactory.getConverterInstance(opts.getCharset());
+		Converter converter = ConverterFactory.getConverterInstance(
+			opts.getCharset(),
+			opts.getReplacements()
+		);
 		DebuggableStrings ds = converter.convert(hex);
 		formatter.format(ds.getValidLineList());
 		String result = ds.toString(

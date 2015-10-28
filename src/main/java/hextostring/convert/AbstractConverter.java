@@ -1,14 +1,17 @@
 package hextostring.convert;
 
+import java.nio.charset.Charset;
+import java.util.List;
+
+import hextostring.ConvertOptions;
 import hextostring.debug.DebuggableLine;
 import hextostring.debug.DebuggableLineList;
 import hextostring.evaluate.EvaluatorFactory;
 import hextostring.evaluate.hex.HexStringEvaluator;
 import hextostring.evaluate.string.ReadableStringEvaluator;
-
-import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.List;
+import hextostring.replacement.HexToStrStrategy;
+import hextostring.replacement.ReplacementType;
+import hextostring.replacement.Replacements;
 
 /**
  * Abstract converter using a definite encoding.
@@ -18,6 +21,7 @@ import java.util.List;
 public abstract class AbstractConverter implements Converter {
 
 	private Charset charset;
+	private Replacements replacements;
 	private HexStringEvaluator hexStringEvaluator;
 	private ReadableStringEvaluator japaneseStringEvaluator;
 
@@ -49,6 +53,14 @@ public abstract class AbstractConverter implements Converter {
 			EvaluatorFactory.getReadableStringEvaluatorInstance();
 	}
 
+	@Override
+	public void setReplacements(Replacements r) {
+		replacements = r;
+		if (replacements == null) {
+			replacements = ConvertOptions.DEFAULT_REPLACEMENTS;
+		}
+	}
+
 	/**
 	 * Verifies if the input is valid and sets it to lowercase without spaces.
 	 *
@@ -76,52 +88,6 @@ public abstract class AbstractConverter implements Converter {
 	protected abstract List<String> extractConvertibleChunks(String hex);
 
 	/**
-	 * Converts a byte array to a string.
-	 *
-	 * @param data
-	 * 			An array of bytes.
-	 * @return The corresponding string.
-	 */
-	private String byteArrayToString(byte[] data) {
-		return new String(data, charset);
-	}
-
-	/**
-	 * Converts a byte list to a string.
-	 *
-	 * @param data
-	 * 			A list of bytes.
-	 * @return The corresponding string.
-	 */
-	private String byteListToString(List<Byte> data) {
-		byte[] arrayData = new byte[data.size()];
-		int cmpt = 0;
-		for (Byte b : data) {
-			arrayData[cmpt++] = b;
-		}
-		return byteArrayToString(arrayData);
-	}
-
-	private static List<Byte> HexStringToByteList(String hex) {
-		List<Byte> byteList = new LinkedList<>();
-		boolean littleEnd = false;
-		int currVal = 0;
-		for (int i = 0; i < hex.length(); ++i) {
-			if (littleEnd) {
-				currVal = currVal | (Character.digit(hex.charAt(i), 16));
-			} else {
-				currVal = (Character.digit(hex.charAt(i), 16)) << 4;
-			}
-			if (littleEnd) {
-				byteList.add((byte) (currVal & 0xFF));
-			}
-			littleEnd = !littleEnd;
-		}
-
-		return byteList;
-	}
-
-	/**
 	 * Converts a hex string into several Japanese lines
 	 *
 	 * @param hex
@@ -134,14 +100,28 @@ public abstract class AbstractConverter implements Converter {
 			extractConvertibleChunks(lines.getHexInput());
 		for (String hexChunk : hexCollection) {
 			DebuggableLine line = new DebuggableLine(hexChunk);
-			line.setHexEvaluationResult(hexStringEvaluator.evaluate(hexChunk));
-			line.setReadableString(
-				byteListToString(
-					HexStringToByteList(hexChunk)
-				)
+			line.setHexAfterHexReplacements(
+				replacements.apply(hexChunk, ReplacementType.HEX2HEX)
 			);
+			line.setHexEvaluationResult(
+				hexStringEvaluator.evaluate(line.getHexAfterHexReplacements())
+			);
+			line.setHexAfterStrReplacements(replacements.apply(
+				line.getHexAfterHexReplacements(),
+				ReplacementType.HEX2STR
+			));
+			line.setReadableString(HexToStrStrategy.toReadableString(
+				line.getHexAfterStrReplacements(),
+				charset
+			));
+			line.setReadableStringAfterReplacements(replacements.apply(
+				line.getReadableString(),
+				ReplacementType.STR2STR
+			));
 			line.setReadableStringEvaluationResult(
-				japaneseStringEvaluator.evaluate(line.getReadableString())
+				japaneseStringEvaluator.evaluate(
+					line.getReadableStringAfterReplacements()
+				)
 			);
 			lines.addLine(line);
 		}

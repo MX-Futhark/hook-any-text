@@ -56,7 +56,7 @@ public class Main {
 			IOUtils.getFileInAppdataDirectory(Options.SERIALIAZATION_FILENAME)
 		);
 		ObjectInputStream ois = new ObjectInputStream (fin);
-		MainOptions res =  (MainOptions) ois.readObject();
+		MainOptions res = (MainOptions) ois.readObject();
 		ois.close();
 		return res;
 	}

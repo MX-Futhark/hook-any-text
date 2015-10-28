@@ -25,6 +25,11 @@ public @interface CommandLineArgument {
 	String description();
 
 	/**
+	 * A description of how this command is used.
+	 */
+	String usage() default "";
+
+	/**
 	 * An example of how this command is used.
 	 */
 	String usageExample() default "";

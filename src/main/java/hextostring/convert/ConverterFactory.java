@@ -2,6 +2,7 @@ package hextostring.convert;
 
 import java.nio.charset.Charset;
 
+import hextostring.replacement.Replacements;
 import hextostring.utils.Charsets;
 
 /**
@@ -28,20 +29,25 @@ public class ConverterFactory {
 	 * 			The charset encoding the hex input.
 	 * @return A fitting converter.
 	 */
-	public static Converter getConverterInstance(Charset charset) {
+	public static Converter getConverterInstance(Charset charset,
+		Replacements r) {
+
+		Converter c;
 		if (charset == Charsets.DETECT) {
-			return encodingAgnosticConverterInstance;
+			c = encodingAgnosticConverterInstance;
 		} else if (charset == Charsets.SHIFT_JIS) {
-			return sjisConverterInstance;
+			c = sjisConverterInstance;
 		} else if (charset == Charsets.UTF16_BE) {
-			return utf16BEConverterInstance;
+			c = utf16BEConverterInstance;
 		} else if (charset == Charsets.UTF16_LE) {
-			return utf16LEConverterInstance;
+			c = utf16LEConverterInstance;
 		} else if (charset == Charsets.UTF8) {
-			return utf8ConverterInstance;
+			c = utf8ConverterInstance;
 		} else {
 			throw new IllegalArgumentException("Invalid charset in options.");
 		}
+		c.setReplacements(r);
+		return c;
 	}
 
 }

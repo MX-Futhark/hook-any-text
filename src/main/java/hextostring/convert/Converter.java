@@ -1,6 +1,7 @@
 package hextostring.convert;
 
 import hextostring.debug.DebuggableStrings;
+import hextostring.replacement.Replacements;
 
 /**
  * Converters transform a hexadecimal string into a readable string.
@@ -10,5 +11,7 @@ import hextostring.debug.DebuggableStrings;
 public interface Converter {
 
 	DebuggableStrings convert(String hex);
+
+	void setReplacements(Replacements r);
 
 }

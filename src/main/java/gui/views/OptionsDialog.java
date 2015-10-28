@@ -2,6 +2,7 @@ package gui.views;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,13 +19,17 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.table.DefaultTableModel;
 
 import gui.actions.OptionsDialogActions;
 import gui.utils.GUIErrorHandler;
 import gui.utils.Images;
+import gui.views.components.ReplacementsTable;
+import hextostring.replacement.Replacements;
 import main.MainOptions;
 import main.options.Options;
 import main.options.annotations.CommandLineArgument;
@@ -59,7 +64,7 @@ public class OptionsDialog extends JDialog {
 		this.opts = opts;
 
 		appendBody();
-		setMinimumSize(new Dimension(400, 450));
+		setMinimumSize(new Dimension(400, 600));
 
 		acts.setCloseAction();
 	}
@@ -74,7 +79,7 @@ public class OptionsDialog extends JDialog {
 	private JTabbedPane getAllTabs() {
 		JTabbedPane tabs = new JTabbedPane();
 		Collection<Options> options =
-			GenericSort.apply(Options.getSubOptions(), null);
+			GenericSort.apply(opts.getSubOptions(), null);
 		try {
 			for (Options option : options) {
 				addOptionTabs(option, tabs);
@@ -85,6 +90,10 @@ public class OptionsDialog extends JDialog {
 
 			new GUIErrorHandler(e);
 		}
+		tabs.add("replacements", getReplacementsPanel(
+			opts.getConvertOptions().getReplacements(),
+			acts
+		));
 		return tabs;
 	}
 
@@ -134,11 +143,13 @@ public class OptionsDialog extends JDialog {
 			} else {
 				String labelContent =
 					StringUtils.camelToWords(field.getName());
-				innerPanel.add(new JLabel(labelContent));
 				JComponent component =
 					getComponentFromField(field, optionObject);
+				if (component == null) continue;
+
 				component.setName(labelContent);
 				acts.setOptionComponentAction(component, field, optionObject);
+				innerPanel.add(new JLabel(labelContent));
 				innerPanel.add(component);
 				empty = false;
 			}
@@ -158,6 +169,35 @@ public class OptionsDialog extends JDialog {
 		for (Field flagField : flagFields) {
 			addFlagTab(optionObject, flagField, tabs);
 		}
+	}
+
+	private JPanel getReplacementsPanel(Replacements replacements,
+		OptionsDialogActions acts) {
+
+		JPanel replacementsPanel = new JPanel(new BorderLayout());
+		final ReplacementsTable replacementsTable =
+			new ReplacementsTable(replacements, acts);
+		replacementsPanel.add(
+			new JScrollPane(replacementsTable),
+			BorderLayout.CENTER
+		);
+
+		JPanel buttonsPanel = new JPanel(new FlowLayout());
+		JButton addReplacementButton = new JButton("Add replacement");
+		acts.setAddReplacementButtonAction(
+			addReplacementButton,
+			(DefaultTableModel) replacementsTable.getModel()
+		);
+		buttonsPanel.add(addReplacementButton);
+		JButton deleteSelectionButton = new JButton("Delete selection");
+		acts.setDeleteSelectionButtonAction(
+			deleteSelectionButton,
+			replacementsTable
+		);
+		buttonsPanel.add(deleteSelectionButton);
+
+		replacementsPanel.add(buttonsPanel, BorderLayout.SOUTH);
+		return replacementsPanel;
 	}
 
 	// Flags are managed differently: every flag corresponds to a checkbox.

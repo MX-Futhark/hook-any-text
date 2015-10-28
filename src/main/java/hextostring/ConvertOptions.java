@@ -7,12 +7,15 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 import hextostring.debug.DebuggingFlags;
+import hextostring.replacement.Replacements;
 import hextostring.utils.Charsets;
 import main.options.Options;
 import main.options.ValueClass;
 import main.options.annotations.CommandLineArgument;
 import main.options.domain.Bounds;
 import main.options.domain.Values;
+import main.options.parser.ArgumentParser;
+import main.options.parser.ReplacementsParser;
 
 /**
  * Options for string conversion.
@@ -22,13 +25,14 @@ import main.options.domain.Values;
 public class ConvertOptions extends Options implements Serializable {
 
 	/**
-	 * Backward-compatible with 6.0.0
+	 * Backward-compatible with 0.7.0
 	 */
-	private static final long serialVersionUID = 00000600000000000L;
+	private static final long serialVersionUID = 00000000007000000L;
 
 	public static final int DEFAULT_STRICTNESS = 20;
 	public static final Charset DEFAULT_CHARSET = Charsets.DETECT;
 	public static final boolean DEFAULT_AUTOCOPY = true;
+	public static final Replacements DEFAULT_REPLACEMENTS = new Replacements();
 
 	public static final long DEFAULT_DEBUGGING_FLAGS = 0;
 
@@ -72,6 +76,30 @@ public class ConvertOptions extends Options implements Serializable {
 	public static final
 		Class<? extends ValueClass> DEBUGGING_FLAGS_VALUE_CLASS =
 			DebuggingFlags.class;
+
+	@CommandLineArgument(
+		command = "replacements",
+		description = "Replacements of sequences and patterns at different "
+			+ "steps of the convertion process.",
+		usage = "{[0x]\"<string>\">[0x]\"<string>\"[e][r]} "
+			+ "(values are commas separated) where: \n"
+			+ "  - <string> represent respectively either a sequence of "
+			+ "hexadecimal numbers or a string.\n"
+			+ "    Replacements of strings to hexadecimal is forbidden.\n"
+			+ "  - 0x is optional and indicates that the following string is "
+			+ "interpreted as hexadecimal or a pattern of hexadecimal.\n"
+			+ "  - e is optional and indicates that antislashes must be "
+			+ "interpreted as an escaping character.\n"
+			+ "  - r is optional and indicates that X is a regular expression "
+			+ "and Y its replacement, possibly containg backward references to "
+			+ "groups in X.",
+		usageExample = "--replacements=\"#RUBS(.*?)#RUBE\">\"[$1]\"r,"
+			+ "0x\"8745\">\"\\u2049\"e"
+	)
+	private Replacements replacements = DEFAULT_REPLACEMENTS;
+	public static final
+		Class<? extends ArgumentParser<Replacements>> REPLACEMENTS_PARSER =
+			ReplacementsParser.class;
 
 	public ConvertOptions() {
 		super();
@@ -155,6 +183,15 @@ public class ConvertOptions extends Options implements Serializable {
 	 */
 	public synchronized void setAutocopy(boolean autocopy) {
 		this.autocopy = autocopy;
+	}
+
+	/**
+	 * Getter on the replacements.
+	 *
+	 * @return The replacements.
+	 */
+	public synchronized Replacements getReplacements() {
+		return replacements;
 	}
 
 	private void writeObject(ObjectOutputStream out) throws IOException {

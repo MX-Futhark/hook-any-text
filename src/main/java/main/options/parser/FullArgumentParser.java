@@ -20,14 +20,20 @@ public class FullArgumentParser<T> extends ArgumentParser<T> {
 		super(opts, f, "--" + argument + "=");
 	}
 
-	@Override
-	protected T getArgumentValue(String arg)
-		throws IncompatibleParserException {
+	public String checkArgumentAndGetValue(String arg)
+		throws IncompatibleParserException{
 
 		if (!arg.substring(0, arg.indexOf("=") + 1).equals(getArgument())) {
 			throw new IncompatibleParserException();
 		}
-		String strValue = arg.replace(getArgument(), "");
+		return arg.replace(getArgument(), "");
+	}
+
+	@Override
+	protected T getArgumentValue(String arg)
+		throws IncompatibleParserException {
+
+		String strValue = checkArgumentAndGetValue(arg);
 		boolean isFlags = getAffectedOptField()
 			.getAnnotation(CommandLineArgument.class).flags();
 		try {

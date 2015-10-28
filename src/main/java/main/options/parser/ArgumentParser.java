@@ -42,13 +42,13 @@ public abstract class ArgumentParser<T> {
 		IllegalAccessException, SecurityException, ValueOutOfDomainException,
 		IncompatibleParserException {
 
-		T value =  getArgumentValue(arg);
+		T value = getArgumentValue(arg);
 		Domain<T> fieldDomain = null;
 		try {
 			fieldDomain =
 				(Domain<T>) affectedOptObject.getFieldDomain(affectedOptField);
 		} catch (NoSuchFieldException e) {}
-		if (fieldDomain == null || fieldDomain.inDomain((T) value)) {
+		if (fieldDomain == null || fieldDomain.inDomain(value)) {
 			affectedOptField.setAccessible(true);
 			affectedOptField.set(affectedOptObject, value);
 		} else {

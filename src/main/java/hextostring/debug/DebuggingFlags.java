@@ -16,6 +16,10 @@ public class DebuggingFlags implements ValueClass {
 
 	// _input
 	private static final String LINE_HEX_INPUT_CHAR = "i";
+	// _input after _hexadecimal replacements
+	private static final String LINE_HEX_AFTER_HEX_REPL_CHAR = "h";
+	// _transitory phase between hex & string
+	private static final String LINE_HEX_AFTER_STR_REPL_CHAR = "t";
 	// _global
 	private static final String LINE_LIST_HEX_INPUT_CHAR = "g";
 	// ("validity")16 = _76 61 6c 69 64 69 74 79
@@ -32,6 +36,8 @@ public class DebuggingFlags implements ValueClass {
 	private static final String LINE_TOTAL_VALIDITY_DETAILS_CHAR = "D";
 	// _non formatted
 	private static final String LINE_NON_FORMATTED_CHAR = "n";
+	// _ultimate phase before formatting
+	private static final String LINE_NON_FORMATTED_AFTER_STR_REPL_CHAR = "u";
 	// _filtered out
 	private static final String LINE_REJECTED_CHAR = "f";
 	// _encoding
@@ -49,12 +55,26 @@ public class DebuggingFlags implements ValueClass {
 	)
 	public static final long LINE_HEX_INPUT = 1 << 0;
 
+	@CommandLineValue(
+		value = LINE_HEX_AFTER_HEX_REPL_CHAR,
+		description = "Hexadecimal versions of the converted lines after "
+			+ "hexadecimal replacements"
+	)
+	public static final long LINE_HEX_AFTER_HEX_REPL_INPUT = 1 << 1;
+
+	@CommandLineValue(
+		value = LINE_HEX_AFTER_STR_REPL_CHAR,
+		description = "Transitory versions of the converted lines after "
+			+ "hexadecimal to string replacements"
+	)
+	public static final long LINE_HEX_AFTER_STR_REPL_INPUT = 1 << 2;
+
 
 	@CommandLineValue(
 		value = LINE_LIST_HEX_INPUT_CHAR,
 		description = "Global hexadecimal inputs"
 	)
-	public static final long LINE_LIST_HEX_INPUT = 1 << 1;
+	public static final long LINE_LIST_HEX_INPUT = 1 << 3;
 
 
 	@CommandLineValue(
@@ -62,13 +82,13 @@ public class DebuggingFlags implements ValueClass {
 		description =
 			"Validity mark of the the hexadecimal versions of the lines"
 	)
-	public static final long LINE_HEX_VALIDITY = 1 << 2;
+	public static final long LINE_HEX_VALIDITY = 1 << 4;
 
 	@CommandLineValue(
 		value = LINE_STRING_VALIDITY_CHAR,
 		description = "Validity mark of the lines"
 	)
-	public static final long LINE_STRING_VALIDITY = 1 << 3;
+	public static final long LINE_STRING_VALIDITY = 1 << 5;
 
 	@CommandLineValue(
 		value = LINE_TOTAL_VALIDITY_CHAR,
@@ -84,14 +104,14 @@ public class DebuggingFlags implements ValueClass {
 			+ "versions of the lines"
 	)
 	public static final long LINE_HEX_VALIDITY_DETAILS =
-		(1 << 4) | LINE_HEX_VALIDITY;
+		(1 << 6) | LINE_HEX_VALIDITY;
 
 	@CommandLineValue(
 		value = LINE_STRING_VALIDITY_DETAILS_CHAR,
 		description = "Details on the validity mark of the lines"
 	)
 	public static final long LINE_STRING_VALIDITY_DETAILS =
-		(1 << 5) | LINE_STRING_VALIDITY;
+		(1 << 7) | LINE_STRING_VALIDITY;
 
 	@CommandLineValue(
 		value = LINE_TOTAL_VALIDITY_DETAILS_CHAR,
@@ -105,14 +125,21 @@ public class DebuggingFlags implements ValueClass {
 		value = LINE_NON_FORMATTED_CHAR,
 		description = "Non formatted version of the lines"
 	)
-	public static final long LINE_NON_FORMATTED = 1 << 6;
+	public static final long LINE_NON_FORMATTED = 1 << 8;
+
+	@CommandLineValue(
+		value = LINE_NON_FORMATTED_AFTER_STR_REPL_CHAR,
+		description = "Non formatted version of the lines after string "
+			+ "replacements"
+	)
+	public static final long LINE_NON_FORMATTED_AFTER_STR_REPL = 1 << 9;
 
 
 	@CommandLineValue(
 		value = LINE_REJECTED_CHAR,
 		description="Lines rejected due to their validity"
 	)
-	public static final long LINE_REJECTED = 1 << 7;
+	public static final long LINE_REJECTED = 1 << 10;
 
 
 
@@ -125,7 +152,7 @@ public class DebuggingFlags implements ValueClass {
 		description = "Encoding detected for the converted lines",
 		condition = AUTODETECT_CONDITION
 	)
-	public static final long LINE_LIST_ENCODING = 1 << 8;
+	public static final long LINE_LIST_ENCODING = 1 << 11;
 
 	@CommandLineValue(
 		value = LINE_LIST_ENCODING_VALIDITY_CHAR,
@@ -133,7 +160,7 @@ public class DebuggingFlags implements ValueClass {
 			"Validity mark of the encoding detected for the converted lines",
 		condition = AUTODETECT_CONDITION
 	)
-	public static final long LINE_LIST_ENCODING_VALIDITY = 1 << 9;
+	public static final long LINE_LIST_ENCODING_VALIDITY = 1 << 12;
 
 	@CommandLineValue(
 		value = LINE_LIST_ENCODING_VALIDITY_DETAILS_CHAR,
@@ -142,14 +169,14 @@ public class DebuggingFlags implements ValueClass {
 		condition = AUTODETECT_CONDITION
 	)
 	public static final long LINE_LIST_ENCODING_VALIDITY_DETAILS =
-		(1 << 10) | LINE_LIST_ENCODING_VALIDITY;
+		(1 << 13) | LINE_LIST_ENCODING_VALIDITY;
 
 	@CommandLineValue(
 		value = LINE_LIST_ENCODING_REJECTED_CHAR,
 		description = "Lines converted with a rejected encoding",
 		condition = AUTODETECT_CONDITION
 	)
-	public static final long LINE_LIST_ENCODING_REJECTED = 1 << 11;
+	public static final long LINE_LIST_ENCODING_REJECTED = 1 << 14;
 
 	/**
 	 * Gives the command line string values corresponding to an actual long

@@ -73,6 +73,7 @@ Test files are put into the tests directory. Its architecture is as follows:
         |-sjis (contains tests for games using Shift JIS)
         | |-handmade (contains tests crafted without relying on a game)
         | |-[game1]
+        | | |-cmd.txt (contains description of options optimized for this game)
         | | |-input
         | | | |-0001.txt
         | | | |-0002.txt
@@ -85,6 +86,7 @@ Test files are put into the tests directory. Its architecture is as follows:
         | |-...
         |-utf16 (contains tests for games using UTF-16)
         | |-[gameA]
+        | | |-cmd.txt
         | | |-input
         | | | |-0001.txt
         | | | |-0002.txt

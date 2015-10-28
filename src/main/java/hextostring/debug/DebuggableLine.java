@@ -15,8 +15,10 @@ import main.utils.StringUtils;
 public class DebuggableLine {
 
 	private String hex;
+	private String hexAfterHexReplacements;
+	private String hexAfterStrReplacements;
 	private String readableString;
-	private String formattedString;
+	private String readableStringAfterReplacements;
 
 	private EvaluationResult hexEvaluationResult;
 	private EvaluationResult readableStringEvaluationResult;
@@ -25,7 +27,7 @@ public class DebuggableLine {
 	private String decorationAfter = "";
 
 	public DebuggableLine(String hex) {
-		this.hex = hex;
+		setHex(hex);
 	}
 
 	/**
@@ -35,6 +37,64 @@ public class DebuggableLine {
 	 */
 	public String getHex() {
 		return hex;
+	}
+
+	/**
+	 * Setter on the hex chunk from which this line originates.
+	 *
+	 * @param hex
+	 * 			The hex chunk from which this line originates.
+	 */
+	public void setHex(String hex) {
+		this.hex = hex;
+		setHexAfterHexReplacements(hex);
+	}
+
+	/**
+	 * Getter on the hex chunk from which this line originates to which HEX2HEX
+	 * replacements were applied.
+	 *
+	 * @return The hex chunk from which this line originates to which HEX2HEX
+	 * 		replacements were applied.
+	 */
+	public String getHexAfterHexReplacements() {
+		return hexAfterHexReplacements;
+	}
+
+	/**
+	 * Setter on the hex chunk from which this line originates to which HEX2HEX
+	 * replacements were applied.
+	 *
+	 * @param hexAfterHexReplacements
+	 * 			The hex chunk from which this line originates to which HEX2HEX
+	 * 			replacements were applied.
+	 */
+	public void setHexAfterHexReplacements(String hexAfterHexReplacements) {
+		this.hexAfterHexReplacements = hexAfterHexReplacements;
+		setHexAfterStrReplacements(hexAfterHexReplacements);
+	}
+
+	/**
+	 * Getter on the hex chunk from which this line originates to which HEX2HEX
+	 * & HEX2STR replacements were applied.
+	 *
+	 * @return The hex chunk from which this line originates to which HEX2HEX
+	 * 		& HEX2STR replacements were applied.
+	 */
+	public String getHexAfterStrReplacements() {
+		return hexAfterStrReplacements;
+	}
+
+	/**
+	 * Setter on the hex chunk from which this line originates to which HEX2HEX
+	 * & HEX2STR replacements were applied.
+	 *
+	 * @param hexAfterStrReplacements
+	 * 			The hex chunk from which this line originates to which HEX2HEX
+	 * 			& HEX2STR replacements were applied.
+	 */
+	public void setHexAfterStrReplacements(String hexAfterStrReplacements) {
+		this.hexAfterStrReplacements = hexAfterStrReplacements;
 	}
 
 	/**
@@ -54,27 +114,32 @@ public class DebuggableLine {
 	 */
 	public void setReadableString(String readableString) {
 		this.readableString = readableString;
-		// if no formatting is performed, formattedString = readableString
-		this.formattedString = readableString;
+		setReadableStringAfterReplacements(readableString);
 	}
 
 	/**
-	 * Getter on the formatted string.
+	 * Getter on the non-formatted string to which STR2STR replacements were
+	 * applied.
 	 *
-	 * @return The formatted string.
+	 * @return The non-formatted string to which STR2STR replacements were
+	 * 		applied.
 	 */
-	public String getFormattedString() {
-		return formattedString;
+	public String getReadableStringAfterReplacements() {
+		return readableStringAfterReplacements;
 	}
 
 	/**
-	 * Setter on the formatted string.
+	 * Setter on the non-formatted string to which STR2STR replacements were
+	 * applied.
 	 *
-	 * @param formattedString
-	 * 			The new formatted string.
+	 * @param readableStringAfterReplacements
+	 * 			The non-formatted string to which STR2STR replacements were
+	 * 			applied.
 	 */
-	public void setFormattedString(String formattedString) {
-		this.formattedString = formattedString;
+	public void setReadableStringAfterReplacements(
+		String readableStringAfterReplacements) {
+
+		this.readableStringAfterReplacements = readableStringAfterReplacements;
 	}
 
 	/**
@@ -161,7 +226,19 @@ public class DebuggableLine {
 		StringBuilder sb = new StringBuilder();
 
 		if ((debuggingFlags & DebuggingFlags.LINE_HEX_INPUT) > 0) {
-			sb.append("hex: 0x" + hex + "\n");
+			sb.append("hex: \n0x" + hex + "\n");
+		}
+		if ((debuggingFlags & DebuggingFlags.LINE_HEX_AFTER_HEX_REPL_INPUT)
+			> 0) {
+
+			sb.append("hex after hex replacements: \n0x"
+				+ hexAfterHexReplacements + "\n");
+		}
+		if ((debuggingFlags & DebuggingFlags.LINE_HEX_AFTER_STR_REPL_INPUT)
+			> 0) {
+
+			sb.append("hex after str replacements: \n0x"
+				+ hexAfterStrReplacements + "\n");
 		}
 
 		if ((debuggingFlags & DebuggingFlags.LINE_HEX_VALIDITY) > 0) {
@@ -195,16 +272,19 @@ public class DebuggableLine {
 
 		if ((debuggingFlags & DebuggingFlags.LINE_NON_FORMATTED) > 0) {
 			sb.append("non formatted: \n" + readableString + "\n");
-			sb.append("formatted: \n");
-		} else if (debuggingFlags > 0) {
-			sb.append("result: \n");
+		}
+		if ((debuggingFlags & DebuggingFlags.LINE_NON_FORMATTED_AFTER_STR_REPL)
+			> 0) {
+
+			sb.append("non formatted after replacements: \n"
+				+ readableStringAfterReplacements + "\n");
 		}
 
-		sb.append(StringUtils.indent(
-			decorationBefore + formattedString + decorationAfter,
-			"\t",
-			debuggingFlags > 0 ? 1 : 0
-		));
+		if (debuggingFlags > 0) {
+			sb.append("result: \n");
+		}
+		sb.append(decorationBefore + readableStringAfterReplacements
+			+ decorationAfter);
 
 		return sb.toString();
 	}

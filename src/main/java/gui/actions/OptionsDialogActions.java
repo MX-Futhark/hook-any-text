@@ -2,12 +2,17 @@ package gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Queue;
 
 import javax.swing.JButton;
@@ -16,14 +21,20 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 
 import gui.utils.GUIErrorHandler;
 import gui.views.OptionsDialog;
+import gui.views.components.ReplacementsTable;
 import hexcapture.HexOptions;
 import hexcapture.HexPipeCompleter;
+import hextostring.replacement.Replacement;
+import hextostring.replacement.ReplacementType;
+import hextostring.replacement.Replacements;
 import main.MainOptions;
 import main.options.Options;
 import main.utils.ReflectionUtils;
@@ -215,6 +226,276 @@ public class OptionsDialogActions {
 		});
 	}
 
+	/**
+	 * Sets the action for the "add replacement" button.
+	 *
+	 * @param addReplacementButton
+	 * 			The button.
+	 * @param tableModel
+	 * 			The model of the table containing the replacements.
+	 */
+	public void setAddReplacementButtonAction(JButton addReplacementButton,
+		final DefaultTableModel tableModel) {
+
+		addReplacementButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tableModel.addRow(
+					new Object[]{new Replacement(ReplacementType.STR2STR)}
+				);
+			}
+		});
+	}
+
+	/**
+	 * Sets the action for the "delete selection" button.
+	 *
+	 * @param addReplacementButton
+	 * 			The button.
+	 * @param tableModel
+	 * 			The model of the table containing the replacements.
+	 */
+	public void setDeleteSelectionButtonAction(JButton deleteSelectionButton,
+		final JTable table) {
+
+		deleteSelectionButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int[] selectedInterval = table.getSelectedRows();
+				int firstRowIndex = selectedInterval[0];
+				int intervalSize = selectedInterval.length;
+				DefaultTableModel model = (DefaultTableModel) table.getModel();
+				for (int i = 0; i < intervalSize; ++i) {
+					model.removeRow(firstRowIndex);
+				}
+			}
+		});
+	}
+
+	private static Object[] replacementToArray(Replacement r) {
+		return new Object[]{
+			r.getSequence(),
+			r.getReplacement(),
+			r.isEscapeCharacters(),
+			r.isInterpretAsPattern(),
+			r.getType()
+		};
+	}
+
+	/**
+	 * Sets the actions associated to the model of the replacement table.
+	 *
+	 * @param table
+	 * 			The table containing the replacements.
+	 * @param columnNames
+	 * 			The titles of the columns.
+	 * @param replacements
+	 * 			The replacements managed by the table.
+	 */
+	@SuppressWarnings("serial")
+	public void setReplacementTableModelActions(final ReplacementsTable table,
+		String[] columnNames, final Replacements replacements) {
+
+		table.setModel(new DefaultTableModel(columnNames, 0) {
+
+			private List<Object[]> data = new ArrayList<>();
+			private int columnCount =
+				replacementToArray(new Replacement(null)).length;
+
+			public DefaultTableModel init() {
+				for (Replacement replacement : replacements.getAll()) {
+					Object[] newRow = replacementToArray(replacement);
+					data.add(newRow);
+					visualAddRow(newRow);
+				}
+				return this;
+			}
+
+			@Override
+			public void insertRow(final int index, final Object[] rowData) {
+				final Replacement r = (Replacement) rowData[0];
+				Object[] newRow = replacementToArray(r);
+				data.add(index, newRow);
+				visualInsertRow(index, newRow);
+
+				optionModifications.add(new ModificationAction() {
+					@Override
+					public void cancel() throws Exception {
+						data.remove(index);
+						visualRemoveRow(index);
+					}
+
+					@Override
+					public void apply() throws Exception {
+						replacements.add(r);
+					}
+				});
+			}
+
+			@Override
+			public void addRow(Object[] rowData) {
+				insertRow(getRowCount(), rowData);
+			}
+
+			@Override
+			public void removeRow(final int row) {
+				final Object[] deletedReplacement = data.remove(row);
+				super.removeRow(row);
+
+				optionModifications.add(new ModificationAction() {
+					@Override
+					public void cancel() throws Exception {
+						data.add(row, deletedReplacement);
+						visualInsertRow(row, deletedReplacement);
+					}
+
+					@Override
+					public void apply() throws Exception {
+						replacements.remove(row);
+					}
+				});
+			}
+
+			@Override
+			public void setValueAt(final Object val, final int row,
+				final int column) {
+
+				if (column >= columnCount) return;
+
+				final Object previousVal = data.get(row)[column];
+				data.get(row)[column] = val;
+				visualSetValueAt(val, row, column);
+
+				optionModifications.add(new ModificationAction() {
+					@Override
+					public void cancel() throws Exception {
+						data.get(row)[column] = previousVal;
+						visualSetValueAt(previousVal, row, column);
+					}
+
+					@Override
+					public void apply() throws Exception {
+						switch (column) {
+						case 0 : replacements.get(row)
+							.setSequence((String) val);
+						break;
+						case 1 : replacements.get(row)
+							.setReplacement((String) val);
+						break;
+						case 2 : replacements.get(row)
+							.setEscapeCharacters((Boolean) val);
+						break;
+						case 3 : replacements.get(row)
+							.setInterpretAsPattern((Boolean) val);
+						break;
+						case 4 : replacements.setType(
+							replacements.get(row),
+							(ReplacementType) val
+						);
+						break;
+						}
+					}
+				});
+			}
+
+			@Override
+		    public Object getValueAt(int row, int col) {
+				return col < columnCount ? data.get(row)[col] : null;
+		    }
+
+			@Override
+		    public Class<?> getColumnClass(int col) {
+		        if (col < 2) {
+		            return String.class;
+		        } else if (col == 4) {
+		        	return ReplacementType.class;
+		        }
+		        return Boolean.class;
+		    }
+
+			@Override
+			public boolean isCellEditable(int row, int col) {
+				return col < columnCount;
+			}
+
+			public void visualAddRow(Object[] content) {
+				super.addRow(content);
+			}
+
+			public void visualInsertRow(int row, Object[] content) {
+				super.insertRow(row, content);
+			}
+
+			public void visualRemoveRow(int row) {
+				super.removeRow(row);
+			}
+
+			public void visualSetValueAt(Object aValue, int row, int column) {
+				super.setValueAt(aValue, row, column);
+			}
+
+		}.init());
+	}
+
+	/**
+	 * Sets the action for the upwards reordering button of the replacement
+	 * table.
+	 *
+	 * @param table
+	 * 			The table containing the replacements.
+	 * @param columnIndex
+	 * 			The index of the column containing the button.
+	 */
+	public void addReplacementTableUpCellAction(final ReplacementsTable table,
+		final int columnIndex) {
+
+		addReplacementTableReorderCellAction(table, columnIndex, true);
+	}
+
+	/**
+	 * Sets the action for the downwards reordering button of the replacement
+	 * table.
+	 *
+	 * @param table
+	 * 			The table containing the replacements.
+	 * @param columnIndex
+	 * 			The index of the column containing the button.
+	 */
+	public void addReplacementTableDownCellAction(final ReplacementsTable table,
+		final int columnIndex) {
+
+		addReplacementTableReorderCellAction(table, columnIndex, false);
+	}
+
+	private void addReplacementTableReorderCellAction(
+		final ReplacementsTable table, final int columnIndex,
+		final boolean up) {
+
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				int row = table.rowAtPoint(evt.getPoint());
+				if ((up && row == 0)
+					|| (!up && row == table.getRowCount() - 1)) {
+
+					return;
+				}
+				int neighbor = row + (up ? -1 : 1);
+
+				int col = table.columnAtPoint(evt.getPoint());
+				if (col == columnIndex) {
+					DefaultTableModel model =
+						(DefaultTableModel) table.getModel();
+					for (int i = 0; i < model.getColumnCount(); ++i) {
+						Object value = model.getValueAt(neighbor, i);
+						model.setValueAt(model.getValueAt(row, i), neighbor, i);
+						model.setValueAt(value, row, i);
+					}
+				}
+			}
+		});
+	}
+
 	private void applyAllOptionModifications(MainOptions opts) {
 		try {
 			for (ModificationAction modif : optionModifications) {
@@ -232,8 +513,11 @@ public class OptionsDialogActions {
 
 	private void cancelAllModifications() {
 		try {
-			for (ModificationAction modif : optionModifications) {
-				modif.cancel();
+			ListIterator<ModificationAction> iom =
+				new ArrayList<ModificationAction>(optionModifications)
+					.listIterator(optionModifications.size());
+			while (iom.hasPrevious()) {
+				iom.previous().cancel();
 			}
 			optionModifications.clear();
 		} catch (Exception e) {

@@ -7,6 +7,7 @@ import hextostring.debug.DebuggableStrings;
 import hextostring.evaluate.EvaluationResult;
 import hextostring.evaluate.EvaluatorFactory;
 import hextostring.evaluate.encoding.EncodingEvaluator;
+import hextostring.replacement.Replacements;
 import hextostring.utils.Charsets;
 
 /**
@@ -18,13 +19,13 @@ public class EncodingAgnosticConverter implements Converter {
 
 	private AbstractConverter[] converters = {
 		(AbstractConverter)
-			ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS),
+			ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS, null),
 		(AbstractConverter)
-			ConverterFactory.getConverterInstance(Charsets.UTF16_BE),
+			ConverterFactory.getConverterInstance(Charsets.UTF16_BE, null),
 		(AbstractConverter)
-			ConverterFactory.getConverterInstance(Charsets.UTF16_LE),
+			ConverterFactory.getConverterInstance(Charsets.UTF16_LE, null),
 		(AbstractConverter)
-			ConverterFactory.getConverterInstance(Charsets.UTF8)
+			ConverterFactory.getConverterInstance(Charsets.UTF8, null)
 	};
 
 	private EncodingEvaluator encodingEvaluator =
@@ -62,6 +63,13 @@ public class EncodingAgnosticConverter implements Converter {
 		validAttempt.setValidEncoding(true);
 
 		return allAttempts;
+	}
+
+	@Override
+	public void setReplacements(Replacements r) {
+		for (AbstractConverter c : converters) {
+			c.setReplacements(r);
+		}
 	}
 
 }

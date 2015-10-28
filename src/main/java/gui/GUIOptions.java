@@ -14,9 +14,9 @@ import main.options.Options;
 public class GUIOptions extends Options implements Serializable {
 
 	/**
-	 * Backward-compatible with 6.0.0
+	 * Backward-compatible with 0.7.0
 	 */
-	private static final long serialVersionUID = 00000600000000000L;
+	private static final long serialVersionUID = 00000000007000000L;
 
 	private Set<Integer> hiddenDialogIDs = new HashSet<>();
 

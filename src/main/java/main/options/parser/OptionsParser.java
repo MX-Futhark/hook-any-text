@@ -1,6 +1,7 @@
 package main.options.parser;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +54,8 @@ public class OptionsParser {
 				}
 			}
 		} catch (IllegalAccessException | SecurityException
-			| NoSuchMethodException e) {
+			| NoSuchMethodException | IllegalArgumentException
+			| InstantiationException | InvocationTargetException e) {
 
 			e.printStackTrace();
 		}
@@ -63,7 +65,8 @@ public class OptionsParser {
 
 	private List<ArgumentParser<?>> getArgumentParsers()
 		throws IllegalArgumentException, IllegalAccessException,
-		SecurityException, NoSuchMethodException {
+		SecurityException, NoSuchMethodException, InstantiationException,
+		InvocationTargetException {
 
 		List<ArgumentParser<?>> res = new LinkedList<>();
 
@@ -74,6 +77,14 @@ public class OptionsParser {
 		for (Field f : fieldsToSet) {
 			CommandLineArgument cmdArg =
 				f.getAnnotation(CommandLineArgument.class);
+
+			try {
+				res.add(opts.getFieldParser(f)
+					.getConstructor(Options.class, Field.class, String.class)
+					.newInstance(opts, f, cmdArg.command()));
+				continue;
+			} catch (NoSuchFieldException e) {}
+
 			FullArgumentParser<Object> fap =
 				new FullArgumentParser<>(opts, f, cmdArg.command());
 			res.add(fap);

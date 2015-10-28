@@ -16,9 +16,9 @@ import main.options.domain.Values;
 public class HexOptions extends Options implements Serializable {
 
 	/**
-	 * Backward-compatible with 6.0.0
+	 * Backward-compatible with 0.7.0
 	 */
-	private static final long serialVersionUID = 00000600000000000L;
+	private static final long serialVersionUID = 00000000007000000L;
 
 	public static final double DEFAULT_STABILIZATION_THRESHOLD = 0.005;
 	public static final int DEFAULT_REFRESH_DELAY = 50;

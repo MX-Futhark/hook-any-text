@@ -9,7 +9,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,9 +19,8 @@ import hextostring.utils.Charsets;
 import main.options.annotations.CommandLineArgument;
 import main.options.annotations.CommandLineValue;
 import main.options.domain.Domain;
-import main.options.domain.ValueOutOfDomainException;
 import main.options.domain.Values;
-import main.options.parser.OptionsParser;
+import main.options.parser.ArgumentParser;
 import main.utils.GenericSort;
 import main.utils.ReflectionUtils;
 import main.utils.StringUtils;
@@ -54,6 +52,9 @@ import main.utils.StringUtils;
  * the second argument indicates if the first must be added or substracted
  * from the current value.
  *
+ * A configurable member using a custom parser is indicated as follows:
+ * Naming convention: the member's type in SCREAMING_SNAKE_CASE + "_PARSER"
+ *
  * The domain of a member whose values are constrained is indicated as follows:
  * Naming convention: the member's type in SCREAMING_SNAKE_CASE + "_DOMAIN"
  * If the values in the domain have further constraints or in the case of a
@@ -61,11 +62,15 @@ import main.utils.StringUtils;
  * members of a separate class.
  * These members must be given a CommandLineValue annotation.
  * Said class is indicated as follows:
- * Naming convention: the member's type in SCREAMING_SNAKE_CASE + "VALUE_CLASS"
+ * Naming convention: the member's type in SCREAMING_SNAKE_CASE + "_VALUE_CLASS"
  *
  * @author Maxime PIA
  */
 public abstract class Options {
+
+	// used to format usage message
+	private static final int INDENT_LENGTH = 4;
+	private static final int DESC_LINE_LENGTH = 80 - INDENT_LENGTH;
 
 	public static final String SERIALIAZATION_FILENAME = "config.data";
 
@@ -90,49 +95,6 @@ public abstract class Options {
 		}
 	};
 
-	private static final Set<Options> subOptions =
-		new HashSet<>();
-
-	public Options() {
-		subOptions.add(this);
-	}
-
-	/**
-	 * Getter on the option objects using this class as a parent.
-	 *
-	 * @return The option objects using this class as a parent.
-	 */
-	public static Set<Options> getSubOptions() {
-		return subOptions;
-	}
-
-	/**
-	 * Parses and applies the command line arguments.
-	 *
-	 * @param args
-	 * 			The command line arguments.
-	 * @throws ValueOutOfDomainException
-	 */
-	public final void parseArgs(String[] args)
-		throws ValueOutOfDomainException {
-
-		if (args.length == 1 && args[0].equals("--help")) {
-			System.out.println(usage(null));
-		} else {
-			List<String> remainingArgs = Arrays.asList(args);
-			for (Options opts : subOptions) {
-				OptionsParser parser = new OptionsParser(opts);
-				remainingArgs = parser.parse(remainingArgs);
-			}
-			if (!remainingArgs.isEmpty()) {
-				throw new IllegalArgumentException(
-					"Illegal command line argument(s) or value(s): "
-						+ remainingArgs + "."
-				);
-			}
-		}
-	}
-
 	/**
 	 * Defines how to use command line options.
 	 *
@@ -140,14 +102,14 @@ public abstract class Options {
 	 * 			The reason why the usage message is printed. May be null.
 	 * @return The usage message.
 	 */
-	public static String usage(String message) {
+	public static String usage(String message, Set<Options> subOptions) {
 		StringBuilder usage = new StringBuilder();
 		if(message != null && !message.isEmpty()) {
 			usage.append(message);
 			usage.append("\n\nPlease use the following options:\n\n");
 		}
 		try {
-			usage.append(generateUsageMessage());
+			usage.append(generateUsageMessage(subOptions));
 		} catch (IllegalArgumentException | IllegalAccessException
 			| NoSuchFieldException | SecurityException
 			| NoSuchMethodException e) {
@@ -158,16 +120,14 @@ public abstract class Options {
 		return usage.toString();
 	}
 
-	private static String generateUsageMessage()
+	private static String generateUsageMessage(Set<Options> subOptions)
 		throws IllegalArgumentException, IllegalAccessException,
 		NoSuchFieldException, SecurityException, NoSuchMethodException {
 
 		StringBuilder usage = new StringBuilder();
 
-		final int INDENT_LENGTH = 4;
-		final int DESC_LINE_LENGTH = 80 - INDENT_LENGTH;
-
-		Collection<Options> sortedOptions = GenericSort.apply(subOptions, null);
+		Collection<Options> sortedOptions =
+			GenericSort.apply(subOptions, null);
 		for (Options opt : sortedOptions) {
 			Collection<Field> sortedFields = GenericSort.apply(
 				ReflectionUtils.getAnnotatedFields(
@@ -179,78 +139,105 @@ public abstract class Options {
 			for (Field argField : sortedFields) {
 				CommandLineArgument argInfo =
 					argField.getAnnotation(CommandLineArgument.class);
-				usage.append("--" + argInfo.command() + "=");
-				if (argInfo.flags()) {
-					usage.append(" combination of ");
-				}
-
-				Domain<?> argDomain = null;
-				try {
-					argDomain = opt.generateArgumentValueDomain(argField);
-					if (argDomain == null) {
-						argDomain = opt.getFieldDomain(argField);
-					}
-				} catch (NoSuchFieldException e) {}
-				Collection<Field> valFields = opt.getValueFields(argField);
-
-				if (argDomain != null) {
-					usage.append(argDomain);
-				} else {
-					usage.append(argField.getType().getSimpleName());
-				}
-
-				Object argDefault = opt.getFieldDefaultValue(argField);
-				if (argDefault != null) {
-					usage.append(", default=");
-					if (argInfo.flags()) {
-						String flagsStr = DebuggingFlags.longToCmdFlags(
-							(Long) opt.getFieldDefaultValue(argField)
-						);
-						usage.append(flagsStr.isEmpty() ? "none" : flagsStr);
-					} else if (valFields == null) {
-						usage.append(argDefault);
-					} else {
-						usage.append(
-							getDefaultValueString(argDefault, valFields)
-						);
-					}
-				}
-				usage.append(
-					"\n" + StringUtils.indent(
-						StringUtils.breakText(
-							argInfo.description(),
-							DESC_LINE_LENGTH
-						), " ", INDENT_LENGTH
-					)
-				);
+				usage.append(getCmdUsage(opt, argField, argInfo));
+				usage.append("\n" + getCmdDescription(argInfo));
 				if (!argInfo.usageExample().isEmpty()) {
-					usage.append("\n" + StringUtils.indent(
-						"example: " + argInfo.usageExample(), " ", INDENT_LENGTH
-					));
+					usage.append("\n" + getCmdExample(argInfo));
 				}
-
-				Collection<CommandLineValue> valDescs;
-				try {
-					valDescs = opt.getValuesDescriptions(
-						opt.getFieldValueClass(argField)
-					);
-					usage.append("\n" + StringUtils.indent(
-						generateValueTable(valDescs),
-						" ",
-						INDENT_LENGTH
-					));
-				} catch (NoSuchFieldException e) {}
-
+				usage.append("\n" + getCmdValueTable(opt, argField));
 				usage.append("\n\n");
 			}
 		}
 
-		usage.append("--help (cannot be used with other options)\n");
-		usage.append(
-			StringUtils.indent("Displays this message.", " ", INDENT_LENGTH)
-		);
+		usage.append(getHelpCmdUsage());
 
 		return usage.toString();
+	}
+
+	private static String getCmdDescription(CommandLineArgument argInfo) {
+		return StringUtils.indent(
+			StringUtils.breakText(
+				argInfo.description(),
+				DESC_LINE_LENGTH
+			), " ", INDENT_LENGTH
+		);
+	}
+
+	private static String getCmdExample(CommandLineArgument argInfo) {
+		return StringUtils.indent(
+			"example: " + argInfo.usageExample(), " ", INDENT_LENGTH
+		);
+	}
+
+	private static String getCmdUsage(Options opt, Field argField,
+		CommandLineArgument argInfo) throws NoSuchMethodException,
+		SecurityException, IllegalArgumentException, IllegalAccessException,
+		NoSuchFieldException {
+
+		StringBuilder usage = new StringBuilder();
+
+		usage.append("--" + argInfo.command() + "=");
+		if (!argInfo.usage().isEmpty()) {
+			usage.append(argInfo.usage());
+			return usage.toString();
+		}
+
+		if (argInfo.flags()) {
+			usage.append(" combination of ");
+		}
+
+		Domain<?> argDomain = null;
+		try {
+			argDomain = opt.generateArgumentValueDomain(argField);
+			if (argDomain == null) {
+				argDomain = opt.getFieldDomain(argField);
+			}
+		} catch (NoSuchFieldException e) {}
+		Collection<Field> valFields = opt.getValueFields(argField);
+
+		if (argDomain != null) {
+			usage.append(argDomain);
+		} else {
+			usage.append(argField.getType().getSimpleName());
+		}
+
+		Object argDefault = opt.getFieldDefaultValue(argField);
+		if (argDefault != null) {
+			usage.append(", default=");
+			if (argInfo.flags()) {
+				String flagsStr = DebuggingFlags.longToCmdFlags(
+					(Long) opt.getFieldDefaultValue(argField)
+				);
+				usage.append(flagsStr.isEmpty() ? "none" : flagsStr);
+			} else if (valFields == null) {
+				usage.append(argDefault);
+			} else {
+				usage.append(
+					getDefaultValueString(argDefault, valFields)
+				);
+			}
+		}
+
+		return usage.toString();
+	}
+
+	private static String getCmdValueTable(Options opt, Field argField)
+		throws NoSuchMethodException, SecurityException,
+		IllegalArgumentException, IllegalAccessException {
+
+		Collection<CommandLineValue> valDescs;
+		try {
+			valDescs = opt.getValuesDescriptions(
+				opt.getFieldValueClass(argField)
+			);
+			return StringUtils.indent(
+				generateValueTable(valDescs),
+				" ",
+				INDENT_LENGTH
+			);
+		} catch (NoSuchFieldException e) {}
+
+		return "";
 	}
 
 	private static String getDefaultValueString(Object defaultValue,
@@ -263,6 +250,11 @@ public abstract class Options {
 			}
 		}
 		return defaultValue.toString();
+	}
+
+	private static String getHelpCmdUsage() {
+		return "--help (cannot be used with other options)\n"
+			+ StringUtils.indent("Displays this message.", " ", INDENT_LENGTH);
 	}
 
 	/**
@@ -482,12 +474,33 @@ public abstract class Options {
 	 * @throws NoSuchFieldException
 	 * @throws SecurityException
 	 */
-	public Class<?> getFieldValueClass(Field argField)
+	@SuppressWarnings("unchecked")
+	public Class<? extends ValueClass> getFieldValueClass(Field argField)
 		throws IllegalArgumentException, IllegalAccessException,
 		NoSuchFieldException, SecurityException {
 
-		return (Class<?>)
+		return (Class<? extends ValueClass>)
 			getFieldAssociatedInformation("", argField, "_VALUE_CLASS");
+	}
+
+	/**
+	 * Getter on the value class of a configurable member.
+	 *
+	 * @param argField
+	 * 			The configurable member.
+	 * @return
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 */
+	@SuppressWarnings("unchecked")
+	public Class<? extends ArgumentParser<?>> getFieldParser(Field argField)
+		throws IllegalArgumentException, IllegalAccessException,
+		NoSuchFieldException, SecurityException {
+
+		return (Class<? extends ArgumentParser<?>>)
+			getFieldAssociatedInformation("", argField, "_PARSER");
 	}
 
 	private Object getFieldAssociatedInformation(String prefix,

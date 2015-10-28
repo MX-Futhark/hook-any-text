@@ -1,6 +1,5 @@
 package hextostring.format;
 
-import hextostring.debug.DebuggableLine;
 import hextostring.debug.DebuggableLineList;
 
 /**
@@ -36,20 +35,6 @@ public abstract class Formatter {
 	 */
 	public void format(DebuggableLineList lines) {
 		decorateLines(lines);
-		updateLinesFormattedString(lines);
-	}
-
-	/**
-	 * Sets the formatting string attribute for each line of the list.
-	 *
-	 * @param lines
-	 * 			A list of lines.
-	 */
-	protected void updateLinesFormattedString(DebuggableLineList lines) {
-		// TODO
-		for (DebuggableLine line : lines.getLines()) {
-			line.setFormattedString(line.getReadableString());
-		}
 	}
 
 	private void decorateLines(DebuggableLineList lines) {

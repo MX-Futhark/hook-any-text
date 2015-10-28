@@ -1,6 +1,7 @@
 package hextostring.tests;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -20,8 +21,11 @@ import hextostring.convert.ConverterFactory;
 import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
+import hextostring.replacement.Replacements;
 import hextostring.utils.Charsets;
 import hextostring.utils.IndentablePrintStream;
+import main.MainOptions;
+import main.options.domain.ValueOutOfDomainException;
 
 /**
  * Main test class.
@@ -38,6 +42,7 @@ import hextostring.utils.IndentablePrintStream;
  *   |-sjis (contains tests for games using Shift JIS)
  *   | |-handmade (contains tests crafted without relying on a game)
  *   | |-[game1]
+ *   | | |-cmd.txt (contains description of options optimized for this game)
  *   | | |-input
  *   | | | |-0001.txt
  *   | | | |-0002.txt
@@ -50,6 +55,7 @@ import hextostring.utils.IndentablePrintStream;
  *   | |-...
  *   |-utf16-be (contains tests for games using UTF-16 Big Endian)
  *   | |-[gameA]
+ *   | | |-cmd.txt
  *   | | |-input
  *   | | | |-0001.txt
  *   | | | |-0002.txt
@@ -83,8 +89,30 @@ public class TestsLauncher {
 		return files;
 	}
 
+	private static List<File> getFilesByType(File[] fs, boolean directory) {
+		List<File> files = new LinkedList<>();
+		for (File f : fs) {
+			if ((directory && f.isDirectory())
+				|| (!directory && !f.isDirectory())) {
+				files.add(f);
+			}
+		}
+		return files;
+	}
+
+	private static ConvertOptions getConvertOptions(File cmdFile)
+		throws IOException, ValueOutOfDomainException {
+
+		String cmd = new String(
+			Files.readAllBytes(cmdFile.toPath()),
+			Charsets.UTF8
+		);
+		return new MainOptions(cmd.split(" ")).getConvertOptions();
+	}
+
 	private static boolean compare(File inputFile, File expectedOutputFile,
-		int indentLevel) {
+		int indentLevel, ConvertOptions opts) {
+
 		try {
 			String input = new String(
 				Files.readAllBytes(inputFile.toPath()),
@@ -98,8 +126,12 @@ public class TestsLauncher {
 			DebuggableStrings dInput = currentConverter.convert(input);
 			formatter.format(dInput.getValidLineList());
 			String actualOutput = dInput.toString(
-				ConvertOptions.DEFAULT_DEBUGGING_FLAGS,
-				ConvertOptions.DEFAULT_STRICTNESS
+				opts == null
+					? ConvertOptions.DEFAULT_DEBUGGING_FLAGS
+					: opts.getDebuggingFlags(),
+				opts == null
+					? ConvertOptions.DEFAULT_STRICTNESS
+					: opts.getStrictness()
 			);
 			out.print(inputFile.getName(), indentLevel);
 
@@ -121,7 +153,7 @@ public class TestsLauncher {
 	}
 
 	private static Map<Boolean, Integer> compareAll(File inputDirectory,
-		File expectedOutputDirectory, int indentLevel) {
+		File expectedOutputDirectory, int indentLevel, ConvertOptions opts) {
 
 		File[] inputs = listSortedFiles(inputDirectory);
 		File[] expectedOutputs = listSortedFiles(expectedOutputDirectory);
@@ -131,7 +163,8 @@ public class TestsLauncher {
 		testResult.put(true, 0);
 
 		for (int i = 0; i < inputs.length && i < expectedOutputs.length; ++i) {
-			boolean eq = compare(inputs[i], expectedOutputs[i], indentLevel);
+			boolean eq =
+				compare(inputs[i], expectedOutputs[i], indentLevel, opts);
 			testResult.put(eq, testResult.get(eq) + 1);
 		}
 
@@ -145,27 +178,29 @@ public class TestsLauncher {
 				|| isEncoding(f.getParentFile(), encodingName);
 	}
 
-	private static void setEncoding(File f, boolean detectEncoding) {
+	private static void setEncoding(File f, boolean detectEncoding,
+		Replacements r) {
+
 		if (detectEncoding) {
 			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.DETECT);
+				ConverterFactory.getConverterInstance(Charsets.DETECT, r);
 		} else if (isEncoding(f, "sjis")) {
 			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS);
+				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS, r);
 		} else if (isEncoding(f, "utf16-be")) {
 			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF16_BE);
+				ConverterFactory.getConverterInstance(Charsets.UTF16_BE, r);
 		} else if (isEncoding(f, "utf16-le")) {
 			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF16_LE);
+				ConverterFactory.getConverterInstance(Charsets.UTF16_LE, r);
 		} else if (isEncoding(f, "utf8")) {
 			currentConverter =
-				ConverterFactory.getConverterInstance(Charsets.UTF8);
+				ConverterFactory.getConverterInstance(Charsets.UTF8, r);
 		}
 	}
 
 	private static Map<Boolean, Integer> goThrough(File f, int indentLevel,
-			boolean detectEncoding) {
+		boolean detectEncoding) throws IOException, ValueOutOfDomainException {
 
 		Map<Boolean, Integer> dirResult = new HashMap<>();
 		dirResult.put(false, 0);
@@ -173,18 +208,30 @@ public class TestsLauncher {
 
 		out.println(f.getName(), indentLevel);
 
-		setEncoding(f, detectEncoding);
-
 		if (f.isDirectory()) {
 			File[] files = listSortedFiles(f);
 			boolean goFurther = true;
 			List<Map<Boolean, Integer>> comparisonResults = new LinkedList<>();
 
-			if (files.length == 2) {
-				if (files[0].getName().equals("expected_output")) {
-					comparisonResults.add(
-						compareAll(files[1], files[0], indentLevel + 1)
-					);
+			List<File> directories = getFilesByType(files, true);
+			if (directories.size() == 2) {
+				if (directories.get(0).getName().equals("expected_output")) {
+					ConvertOptions convOpts = null;
+					List<File> cmd = getFilesByType(files, false);
+					if (!cmd.isEmpty()) {
+						convOpts = getConvertOptions(cmd.get(0));
+					}
+
+					setEncoding(f, detectEncoding, convOpts == null
+						? null
+						: convOpts.getReplacements());
+
+					comparisonResults.add(compareAll(
+						directories.get(1),
+						directories.get(0),
+						indentLevel + 1,
+						convOpts
+					));
 					goFurther = false;
 				}
 			}
@@ -224,7 +271,9 @@ public class TestsLauncher {
 	private static final String DETECT_MSG = "With encoding detection:\n";
 	private static final String SEPARATOR = "\n----------\n\n";
 
-	private static void goThrough(String path) {
+	private static void goThrough(String path) throws IOException,
+		ValueOutOfDomainException {
+
 		File f = new File(path);
 		out.println(NODETECT_MSG);
 		goThrough(f, 0, false);
@@ -232,7 +281,9 @@ public class TestsLauncher {
 		goThrough(f, 0, true);
 	}
 
-	private static void compare(String inputPath, String expectedOutputPath) {
+	private static void compare(String inputPath, String expectedOutputPath,
+		ConvertOptions convOpts) {
+
 		File input = new File(inputPath);
 		if (!input.isFile()) {
 			throw new IllegalArgumentException(
@@ -241,11 +292,11 @@ public class TestsLauncher {
 		}
 		File expectedOutput = new File(expectedOutputPath);
 		out.println(NODETECT_MSG);
-		setEncoding(input.getParentFile(), false);
-		compare(input, expectedOutput, 0 );
+		setEncoding(input.getParentFile(), false, convOpts.getReplacements());
+		compare(input, expectedOutput, 0, convOpts);
 		out.println(SEPARATOR + DETECT_MSG);
-		setEncoding(input.getParentFile(), true);
-		compare(input, expectedOutput, 0 );
+		setEncoding(input.getParentFile(), true, convOpts.getReplacements());
+		compare(input, expectedOutput, 0, convOpts);
 	}
 
 	/**
@@ -254,8 +305,12 @@ public class TestsLauncher {
 	 * @param args
 	 * 			args[0] = directory to test, without initial an final "/"
 	 * 			args[1] = number identifying a test, without ".txt" (optional)
+	 * @throws ValueOutOfDomainException
+	 * @throws IOException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException,
+		ValueOutOfDomainException {
+
 		logger.info("Starting conversion tests...");
 		String testsDirectory =
 			TestsLauncher.class.getResource("/tests").getPath();
@@ -263,8 +318,15 @@ public class TestsLauncher {
 			String directory = testsDirectory + args[0];
 			if (args.length > 1) {
 				String testId = args[1];
-				compare(directory + "/input/" + testId + ".txt",
-					directory + "/expected_output/" + testId + ".txt");
+				File cmd = new File(directory + "/cmd.txt");
+				ConvertOptions convOpts = cmd.exists()
+					? getConvertOptions(cmd)
+					: null;
+				compare(
+					directory + "/input/" + testId + ".txt",
+					directory + "/expected_output/" + testId + ".txt",
+					convOpts
+				);
 			} else {
 				goThrough(directory);
 			}
