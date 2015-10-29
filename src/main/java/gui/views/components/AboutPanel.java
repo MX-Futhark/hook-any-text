@@ -32,10 +32,15 @@ public class AboutPanel extends JPanel {
 				ProjectProperties.get(ProjectProperties.KEY_WEBSITE),
 				"GitHub home page"
 			);
+			JLabel mail = new JLabel(
+				"Contact me at: "
+					+ ProjectProperties.get(ProjectProperties.KEY_MAIL)
+			);
 
 			add(logo);
 			add(version);
 			add(urlButton);
+			add(mail);
 		} catch (IOException er) {
 			new GUIErrorHandler(er);
 		}

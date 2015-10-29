@@ -16,6 +16,7 @@ public class ProjectProperties {
 
 	public static final String KEY_VERSION = "version";
 	public static final String KEY_WEBSITE = "website";
+	public static final String KEY_MAIL = "mail";
 
 	private static Properties props = new Properties();
 	private static boolean propsLoaded = false;
