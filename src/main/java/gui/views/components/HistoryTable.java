@@ -19,8 +19,11 @@ import javax.swing.table.TableColumn;
 @SuppressWarnings("serial")
 public class HistoryTable extends JTable {
 
-	public HistoryTable(String[] columnNames) {
-		super(new DefaultTableModel(columnNames, 0) {
+	private static final String[] COLUMN_NAMES = {"Input", "Output"};
+
+	public HistoryTable() {
+		super(new DefaultTableModel(COLUMN_NAMES, 0) {
+			@Override
 			public boolean isCellEditable(int row, int column){
 				return false;
 			}

@@ -59,8 +59,7 @@ public class HistoryDialog extends JDialog implements Observer {
 	}
 
 	private JScrollPane getTableScrollPane() {
-		String[] columnNames = {"Input", "Output"};
-		historyTable = new HistoryTable(columnNames);
+		historyTable = new HistoryTable();
 		JScrollPane scrollPane = new JScrollPane(historyTable);
 		return scrollPane;
 	}
