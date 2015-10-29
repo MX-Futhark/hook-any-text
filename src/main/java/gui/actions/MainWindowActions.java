@@ -75,11 +75,9 @@ public class MainWindowActions {
 	 * 			The menu item.
 	 */
 	public void setExitItemAction(JMenuItem quitItem) {
-
 		quitItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				mainWindow.dispatchEvent(
 					new WindowEvent(mainWindow, WindowEvent.WINDOW_CLOSING)
 				);

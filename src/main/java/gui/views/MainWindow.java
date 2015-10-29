@@ -66,7 +66,6 @@ public class MainWindow extends JFrame implements Observer {
 
 			new GUIErrorHandler(e);
 		}
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 
