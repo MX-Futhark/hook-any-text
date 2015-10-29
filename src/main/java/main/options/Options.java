@@ -198,7 +198,7 @@ public abstract class Options {
 		if (argDomain != null) {
 			usage.append(argDomain);
 		} else {
-			usage.append(argField.getType().getSimpleName());
+			usage.append("<" + argField.getType().getSimpleName() + ">");
 		}
 
 		Object argDefault = opt.getFieldDefaultValue(argField);
