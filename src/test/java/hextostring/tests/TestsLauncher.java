@@ -76,27 +76,26 @@ import main.options.domain.ValueOutOfDomainException;
  * @author Maxime PIA
  */
 public class TestsLauncher {
+
 	private static Formatter formatter =
 		FormatterFactory.getFormatterInstance(true);
 	private static Converter currentConverter;
 	private static IndentablePrintStream out = new IndentablePrintStream();
+
+	private static final String INPUT_DIR = "input";
+	private static final String EXPECTED_OUTPUT_DIR = "expected_output";
+	private static final String CMD_FILE = "cmd.txt";
+
+	private static final String SJIS_DIR = "sjis";
+	private static final String UTF16BE_DIR = "utf16-be";
+	private static final String UTF16LE_DIR = "utf16-le";
+	private static final String UTF8_DIR = "utf8";
 
 	private static Logger logger = LogManager.getLogger(TestsLauncher.class);
 
 	private static File[] listSortedFiles(File f) {
 		File[] files = f.listFiles();
 		Arrays.sort(files);
-		return files;
-	}
-
-	private static List<File> getFilesByType(File[] fs, boolean directory) {
-		List<File> files = new LinkedList<>();
-		for (File f : fs) {
-			if ((directory && f.isDirectory())
-				|| (!directory && !f.isDirectory())) {
-				files.add(f);
-			}
-		}
 		return files;
 	}
 
@@ -184,19 +183,28 @@ public class TestsLauncher {
 		if (detectEncoding) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.DETECT, r);
-		} else if (isEncoding(f, "sjis")) {
+		} else if (isEncoding(f, SJIS_DIR)) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.SHIFT_JIS, r);
-		} else if (isEncoding(f, "utf16-be")) {
+		} else if (isEncoding(f, UTF16BE_DIR)) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.UTF16_BE, r);
-		} else if (isEncoding(f, "utf16-le")) {
+		} else if (isEncoding(f, UTF16LE_DIR)) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.UTF16_LE, r);
-		} else if (isEncoding(f, "utf8")) {
+		} else if (isEncoding(f, UTF8_DIR)) {
 			currentConverter =
 				ConverterFactory.getConverterInstance(Charsets.UTF8, r);
 		}
+	}
+
+	private static File getFileByName(File[] files, String name) {
+		for(File f : files) {
+			if (f.getName().equals(name)) {
+				return f;
+			}
+		}
+		return null;
 	}
 
 	private static Map<Boolean, Integer> goThrough(File f, int indentLevel,
@@ -213,27 +221,24 @@ public class TestsLauncher {
 			boolean goFurther = true;
 			List<Map<Boolean, Integer>> comparisonResults = new LinkedList<>();
 
-			List<File> directories = getFilesByType(files, true);
-			if (directories.size() == 2) {
-				if (directories.get(0).getName().equals("expected_output")) {
-					ConvertOptions convOpts = null;
-					List<File> cmd = getFilesByType(files, false);
-					if (!cmd.isEmpty()) {
-						convOpts = getConvertOptions(cmd.get(0));
-					}
-
-					setEncoding(f, detectEncoding, convOpts == null
-						? null
-						: convOpts.getReplacements());
-
-					comparisonResults.add(compareAll(
-						directories.get(1),
-						directories.get(0),
-						indentLevel + 1,
-						convOpts
-					));
-					goFurther = false;
+			if (indentLevel == 2) {
+				ConvertOptions convOpts = null;
+				File cmd = getFileByName(files, CMD_FILE);
+				if (cmd != null) {
+					convOpts = getConvertOptions(cmd);
 				}
+
+				setEncoding(f, detectEncoding, convOpts == null
+					? null
+					: convOpts.getReplacements());
+
+				comparisonResults.add(compareAll(
+					getFileByName(files, INPUT_DIR),
+					getFileByName(files, EXPECTED_OUTPUT_DIR),
+					indentLevel + 1,
+					convOpts
+				));
+				goFurther = false;
 			}
 
 			// recursively go through every directory
@@ -317,14 +322,14 @@ public class TestsLauncher {
 		if (args.length > 0) {
 			String directory = testsDirectory + args[0];
 			if (args.length > 1) {
-				String testId = args[1];
-				File cmd = new File(directory + "/cmd.txt");
+				String testFile = args[1] + ".txt";
+				File cmd = new File(directory + "/" + CMD_FILE);
 				ConvertOptions convOpts = cmd.exists()
 					? getConvertOptions(cmd)
 					: null;
 				compare(
-					directory + "/input/" + testId + ".txt",
-					directory + "/expected_output/" + testId + ".txt",
+					directory + "/" + INPUT_DIR + "/" + testFile,
+					directory + "/" + EXPECTED_OUTPUT_DIR + "/" + testFile,
 					convOpts
 				);
 			} else {
