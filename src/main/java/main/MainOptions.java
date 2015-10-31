@@ -50,7 +50,8 @@ public class MainOptions extends Options implements Serializable,
 
 	}
 
-	private void updateSubOptionsSet() {
+	public void updateSubOptionsSet() {
+		subOptions.clear();
 		subOptions.add(this);
 		subOptions.add(this.hexOptions);
 		subOptions.add(this.convertOptions);

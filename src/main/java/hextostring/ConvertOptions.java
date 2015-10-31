@@ -45,7 +45,7 @@ public class ConvertOptions extends Options implements Serializable {
 			+ "value, the higher the chance of mistakenly excluding a valid "
 			+ "string."
 	)
-	private int strictness = DEFAULT_STRICTNESS;
+	private Integer strictness = DEFAULT_STRICTNESS;
 	public static final Bounds<Integer> STRICTNESS_DOMAIN =
 		new Bounds<>(-500, 500);
 
@@ -64,7 +64,7 @@ public class ConvertOptions extends Options implements Serializable {
 		description = "Defines whether or not to automatically copy newly "
 			+ "converted strings in the clipboard."
 	)
-	private boolean autocopy = DEFAULT_AUTOCOPY;
+	private Boolean autocopy = DEFAULT_AUTOCOPY;
 
 	@CommandLineArgument(
 		command = "debug",
@@ -72,7 +72,7 @@ public class ConvertOptions extends Options implements Serializable {
 		usageExample = "--debug=i6n",
 		flags = true
 	)
-	private long debuggingFlags = DEFAULT_DEBUGGING_FLAGS;
+	private Long debuggingFlags = DEFAULT_DEBUGGING_FLAGS;
 	public static final
 		Class<? extends ValueClass> DEBUGGING_FLAGS_VALUE_CLASS =
 			DebuggingFlags.class;

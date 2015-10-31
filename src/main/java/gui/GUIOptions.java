@@ -18,7 +18,9 @@ public class GUIOptions extends Options implements Serializable {
 	 */
 	private static final long serialVersionUID = 00000000007000000L;
 
-	private Set<Integer> hiddenDialogIDs = new HashSet<>();
+	private static final Set<Integer> DEFAULT_HIDDEN_DIALOG_IDS =
+		new HashSet<>();
+	private Set<Integer> hiddenDialogIDs = DEFAULT_HIDDEN_DIALOG_IDS;
 
 	public GUIOptions() {
 		super();

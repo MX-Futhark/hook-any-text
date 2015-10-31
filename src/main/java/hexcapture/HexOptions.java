@@ -33,7 +33,7 @@ public class HexOptions extends Options implements Serializable {
 			+ "of the selection and that of the history is deemed low enough "
 			+ "to convert the selection."
 	)
-	private double stabilizationThreshold = DEFAULT_STABILIZATION_THRESHOLD;
+	private Double stabilizationThreshold = DEFAULT_STABILIZATION_THRESHOLD;
 	public static final Bounds<Double> STABILIZATION_THRESHOLD_DOMAIN =
 		new Bounds<Double>(0d, 1d);
 
@@ -41,7 +41,7 @@ public class HexOptions extends Options implements Serializable {
 		command = "refresh",
 		description = "The number of ms to wait before capturing the selection."
 	)
-	private int refreshDelay = DEFAULT_REFRESH_DELAY;
+	private Integer refreshDelay = DEFAULT_REFRESH_DELAY;
 	public static final Bounds<Integer> REFRESH_DELAY_DOMAIN =
 		new Bounds<>(10, 400);
 
@@ -50,7 +50,7 @@ public class HexOptions extends Options implements Serializable {
 		description = "The length of the array containing the previous "
 			+ "selections."
 	)
-	private int historySize = DEFAULT_HISTORY_SIZE;
+	private Integer historySize = DEFAULT_HISTORY_SIZE;
 	public static final Bounds<Integer> HISTORY_SIZE_DOMAIN =
 		new Bounds<>(1, 20);
 

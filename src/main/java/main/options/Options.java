@@ -64,6 +64,8 @@ import main.utils.StringUtils;
  * Said class is indicated as follows:
  * Naming convention: the member's type in SCREAMING_SNAKE_CASE + "_VALUE_CLASS"
  *
+ * A configurable member must be an object, never a primitive type.
+ *
  * @author Maxime PIA
  */
 public abstract class Options {

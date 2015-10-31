@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
@@ -40,7 +41,7 @@ public class MainWindow extends JFrame implements Observer {
 	private JTextArea convertedStringsArea = new JTextArea("Welcome to HAT!");
 
 	public MainWindow(HexProcessor hp, MainOptions opts,
-		History observedHistory) {
+		History observedHistory, boolean seralizationWarning) {
 
 		super("Hook Any Text");
 		setSize(640, 240);
@@ -67,6 +68,15 @@ public class MainWindow extends JFrame implements Observer {
 			new GUIErrorHandler(e);
 		}
 		setVisible(true);
+
+		if (seralizationWarning) {
+			JOptionPane.showMessageDialog(
+				this,
+				"You must be using a new version of Hook Any Text. "
+					+ "Due to version incompatibilities, "
+					+ "certain settings may have been reset."
+			);
+		}
 	}
 
 	private void appendMenuBar(History observedHistory) {
