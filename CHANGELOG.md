@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 0.7.0 - 2015-11-01
+- Added pattern substitutions
+- Fixed exceptions due to version inconsistencies
+- Set default strictness to 50
+- Fixed #7
+- Added '&' as a possible Japanese character
+- Added contact information is the "about" dialog
+
 ## 0.6.0 - 2015-10-04
 - Added GUI
 - Added automatic option dialog and manual generation

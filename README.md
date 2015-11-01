@@ -52,9 +52,9 @@ The conversion is not done directly in lua because:
 
 The hooking and conversion process can be summarized by the following steps:
 
-1. A hexadecimal string fed to the Java program is first cleaned of all unnecessary parts, such as sequences of zeroes, and separated into as many clean chunks.
+1. A hexadecimal string fed to the Java program is first cleaned of all unnecessary parts, such as sequences of zeroes, and separated into as many clean chunks. Substitutions are made if required by the user.
 2. These chunks are given a mark representing how likely they are to be an actual string.
-3. They are then converted into as many readable strings.
+3. They are then converted into as many readable strings. Substitutions are made if required by the user.
 4. These strings are also given a mark to judge how likely they are to be natural language.
 5. Strings having received a low mark are eliminated.
 6. Strings deemed valid are cleaned of their formatting clues (for example, markup indicating furigana)
