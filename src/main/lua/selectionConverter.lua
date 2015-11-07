@@ -15,12 +15,16 @@ HAT_MENU_ITEM = nil
 function convertHexSelection(threadObj)
 
 	os.remove(CONFIG_FILEPATH)
+	math.randomseed(os.time())
 
 	local hexView = getMemoryViewForm().HexadecimalView
 	local history = {}
 	local recurringHistory = {}
+	local cmdTitle = "HATCMD" .. string.format("%06d", math.random(1000000) - 1)
+	local cmdHidden = false
 	local handle = io.popen(
-		"java.exe -jar \"" .. getCheatEngineDir()
+		"TITLE " .. cmdTitle .. " & "
+			.. "java.exe -jar \"" .. getCheatEngineDir()
 			.. "autorun\\HexToString.jar\" ",
 		"w"
 	)
@@ -61,6 +65,11 @@ function convertHexSelection(threadObj)
 
 		if not HAT_IS_RUNNING then
 			break
+		end
+
+		if not cmdHidden then
+			sendText(":hide " .. cmdTitle)
+			cmdHidden = true
 		end
 
 		if hexView.hasSelection then
