@@ -15,9 +15,11 @@ import main.utils.WindowsUtils;
 public class CommandInterpreter {
 
 	private MainWindow mainWindow;
+	private MainOptions opts;
 
-	public CommandInterpreter(MainWindow mainWindow) {
+	public CommandInterpreter(MainWindow mainWindow, MainOptions opts) {
 		this.mainWindow = mainWindow;
+		this.opts = opts;
 	}
 
 	/**
@@ -43,6 +45,8 @@ public class CommandInterpreter {
 			for (HWND window : windowsToHide) {
 				WindowsUtils.setVisible(window, false);
 			}
+		} else if (cmd.equals("attach")) {
+			opts.getOCROptions().setAttachedPID(Long.parseLong(args[1]));
 		}
 		return false;
 	}

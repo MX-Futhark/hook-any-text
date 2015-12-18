@@ -24,7 +24,7 @@ public class InputInterpreter {
 		this.opts = opts;
 		this.out = out;
 		this.hexProcessor = hexProcessor;
-		this.cmdInterpreter = new CommandInterpreter(mainWindow);
+		this.cmdInterpreter = new CommandInterpreter(mainWindow, opts);
 	}
 
 	private void print(String message) {

@@ -13,6 +13,7 @@ import main.options.EncompassingOptions;
 import main.options.Options;
 import main.options.domain.ValueOutOfDomainException;
 import main.options.parser.OptionsParser;
+import ocr.OCROptions;
 
 /**
  * Contains all the options of the various parts of the program.
@@ -30,6 +31,7 @@ public class MainOptions extends Options implements Serializable,
 	private HexOptions hexOptions;
 	private ConvertOptions convertOptions;
 	private GUIOptions GUIOptions;
+	private OCROptions OCROptions;
 
 	private Set<Options> subOptions = new HashSet<>();
 
@@ -46,6 +48,7 @@ public class MainOptions extends Options implements Serializable,
 		this.hexOptions = new HexOptions();
 		this.convertOptions = new ConvertOptions();
 		this.GUIOptions = new GUIOptions();
+		this.OCROptions = new OCROptions();
 		updateSubOptionsSet();
 
 	}
@@ -56,6 +59,7 @@ public class MainOptions extends Options implements Serializable,
 		subOptions.add(this.hexOptions);
 		subOptions.add(this.convertOptions);
 		subOptions.add(this.GUIOptions);
+		subOptions.add(this.OCROptions);
 	}
 
 	/**
@@ -92,6 +96,15 @@ public class MainOptions extends Options implements Serializable,
 	 */
 	public synchronized GUIOptions getGUIOptions() {
 		return GUIOptions;
+	}
+
+	/**
+	 * Getter of the options for the COR.
+	 *
+	 * @return The options for the OCR.
+	 */
+	public synchronized OCROptions getOCROptions() {
+		return OCROptions;
 	}
 
 	/**

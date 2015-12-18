@@ -5,8 +5,8 @@ import hextostring.convert.ConverterFactory;
 import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
-import hextostring.history.History;
 import hextostring.utils.Clipboard;
+import main.history.History;
 
 /**
  * Full conversion chain for an arbitrary number of input strings.
@@ -19,12 +19,12 @@ public class HexProcessor {
 	// This field is used to avoid flooding the clipboard.
 	private String previousResult = "";
 
-	private History history;
+	private History<String, String> history;
 	private ConvertOptions opts;
 
 	private Formatter formatter = FormatterFactory.getFormatterInstance(false);
 
-	public HexProcessor(ConvertOptions opts, History history) {
+	public HexProcessor(ConvertOptions opts, History<String, String> history) {
 		this.history = history;
 		this.opts = opts;
 	}

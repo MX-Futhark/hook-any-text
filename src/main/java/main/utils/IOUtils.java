@@ -3,6 +3,7 @@ package main.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -15,9 +16,11 @@ import java.util.Map;
  */
 public class IOUtils {
 
+	public static final File RUNNING_JAR_DIRECTORY = getRunningJARDirectory();
+
 	public static final String SUBDIRECTORY = "HookAnyText";
 
-	public static final Map<String, Path> DRICTORIES = new HashMap<>();
+	private static final Map<String, Path> DRICTORIES = new HashMap<>();
 
 	private static final String[] TEMP_DIRECTORIES = {"TMP", "TEMP"};
 	private static final String[] APPDATA_DIRECTORIES = {"APPDATA"};
@@ -86,5 +89,21 @@ public class IOUtils {
 		File f = new File(path.toString());
 		f.createNewFile();
 		return f;
+	}
+
+	// TODO jdoc
+	private static File getRunningJARDirectory() {
+		try {
+			File jarDirectory =
+				new File(IOUtils.class.getProtectionDomain().getCodeSource()
+					.getLocation().toURI().getPath());
+			if (!jarDirectory.isDirectory()) {
+				jarDirectory = jarDirectory.getParentFile();
+			}
+			return jarDirectory;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

@@ -15,7 +15,7 @@ import gui.actions.HistoryDialogActions;
 import gui.utils.Images;
 import gui.views.components.HistoryTable;
 import hextostring.HexProcessor;
-import hextostring.history.History;
+import main.history.History;
 import main.utils.StringUtils;
 
 /**
@@ -35,8 +35,8 @@ public class HistoryDialog extends JDialog implements Observer {
 
 	private int latestDisplayed = -1;
 
-	public HistoryDialog(MainWindow mainWindow, History observedHistory,
-		HexProcessor hp) {
+	public HistoryDialog(MainWindow mainWindow,
+		History<String, String> observedHistory, HexProcessor hp) {
 
 		setTitle("History");
 		setModal(false);
@@ -80,7 +80,8 @@ public class HistoryDialog extends JDialog implements Observer {
 
 	@Override
 	public synchronized void update(Observable o, Object arg) {
-		History history = (History) o;
+		@SuppressWarnings("unchecked")
+		History<String, String> history = (History<String, String>) o;
 		DefaultTableModel model = (DefaultTableModel) historyTable.getModel();
 		model.addRow(new Object[]{
 			breakTooltipContent(history.getLast().getInput(), 100),

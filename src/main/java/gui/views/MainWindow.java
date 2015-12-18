@@ -1,5 +1,6 @@
 package gui.views;
 
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Observable;
@@ -22,8 +23,8 @@ import gui.utils.GUIErrorHandler;
 import gui.utils.Images;
 import gui.views.components.HidableOKCancelDialog;
 import hextostring.HexProcessor;
-import hextostring.history.History;
 import main.MainOptions;
+import main.history.History;
 
 /**
  * The main window of the GUI.
@@ -41,7 +42,9 @@ public class MainWindow extends JFrame implements Observer {
 	private JTextArea convertedStringsArea = new JTextArea("Welcome to HAT!");
 
 	public MainWindow(HexProcessor hp, MainOptions opts,
-		History observedHistory, boolean seralizationWarning) {
+		History<String, String> hexHistory,
+		History<Rectangle, String> ocrHistory,
+		boolean seralizationWarning) {
 
 		super("Hook Any Text");
 		setSize(640, 240);
@@ -49,11 +52,12 @@ public class MainWindow extends JFrame implements Observer {
 
 		this.opts = opts;
 		this.hp = hp;
-		observedHistory.addObserver(this);
+		hexHistory.addObserver(this);
+		ocrHistory.addObserver(this);
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			appendMenuBar(observedHistory);
+			appendMenuBar(hexHistory);
 			appendFrameContent();
 			acts.setCloseAction(new HidableOKCancelDialog(
 				HidableOKCancelDialog.CLOSE_CONFIRM,
@@ -79,7 +83,7 @@ public class MainWindow extends JFrame implements Observer {
 		}
 	}
 
-	private void appendMenuBar(History observedHistory) {
+	private void appendMenuBar(History<String, String> observedHistory) {
 		JMenuBar menuBar = new JMenuBar();
 
 		menuBar.add(getFileMenu());
@@ -98,7 +102,7 @@ public class MainWindow extends JFrame implements Observer {
 		return fileMenu;
 	}
 
-	private JMenu getEditMenu(History observedHistory) {
+	private JMenu getEditMenu(History<String, String> observedHistory) {
 		JMenu editMenu = new JMenu("Edit");
 
 		JMenuItem previousLineItem = new JMenuItem("Previous Line");
@@ -155,7 +159,8 @@ public class MainWindow extends JFrame implements Observer {
 
 	@Override
 	public synchronized void update(Observable o, Object arg) {
-		History history = (History) o;
+		@SuppressWarnings("unchecked")
+		History<?, String> history = (History<?, String>) o;
 		convertedStringsArea.setText(history.getLast().getOutput());
 	}
 

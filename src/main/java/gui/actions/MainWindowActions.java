@@ -14,6 +14,7 @@ import gui.views.HistoryDialog;
 import gui.views.MainWindow;
 import gui.views.components.AboutPanel;
 import gui.views.components.HidableOKCancelDialog;
+import main.Main;
 
 /**
  * Contains all the actions for the view MainWindow.
@@ -44,8 +45,7 @@ public class MainWindowActions {
 			public void windowClosing(WindowEvent e) {
 				int userResponse = closeConfirm.show();
 				if (userResponse == JOptionPane.OK_OPTION) {
-					mainWindow.dispose();
-					System.exit(0);
+					Main.closeAll(mainWindow);
 				}
 			}
 		});

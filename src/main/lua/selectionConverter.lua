@@ -38,6 +38,10 @@ function convertHexSelection(threadObj)
 		handle:flush()
 	end
 
+	onOpenProcess = function(processid)
+		sendText(":attach " .. processid)
+	end
+
 	getMainForm().OnClose = function(sender)
 		pcall(function()
 			sendText(":exit")

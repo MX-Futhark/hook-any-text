@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Rectangle;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,11 +15,13 @@ import java.util.concurrent.ExecutorCompletionService;
 import gui.views.MainWindow;
 import hexcapture.HexPipeCompleter;
 import hextostring.HexProcessor;
-import hextostring.history.History;
+import main.history.History;
 import main.options.Options;
 import main.options.annotations.CommandLineArgument;
 import main.utils.IOUtils;
 import main.utils.ReflectionUtils;
+import ocr.OCROptions;
+import ocr.selection.SelectionToOCR;
 
 /**
  * Standard main class of the program.
@@ -122,6 +125,13 @@ public class Main {
 		return incompatibilityDetected;
 	}
 
+	// TODO jdoc
+	public static void closeAll(MainWindow mainWindow) {
+		SelectionToOCR.stopOCR();
+		mainWindow.dispose();
+		System.exit(0);
+	}
+
 	/**
 	 * Starts a conversion session and displays the GUI.
 	 *
@@ -130,7 +140,8 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		try {
-			final History history = new History();
+			final History<String, String> hexHistory =
+				new History<String, String>();
 			HexPipeCompleter hpc = new HexPipeCompleter();
 
 			MainOptions opts;
@@ -157,10 +168,14 @@ public class Main {
 
 			hpc.updateConfig(opts.getHexOptions());
 
+			final OCROptions ocrOpts = opts.getOCROptions();
+			final History<Rectangle, String> ocrHistory = new History<>();
+
 			HexProcessor hp =
-				new HexProcessor(opts.getConvertOptions(), history);
-			MainWindow window =
-				new MainWindow(hp, opts, history, serializationWarning);
+				new HexProcessor(opts.getConvertOptions(), hexHistory);
+			MainWindow window = new MainWindow(
+				hp, opts, hexHistory, ocrHistory, serializationWarning
+			);
 			final InputInterpreter ii =
 				new InputInterpreter(opts, System.out, hp, window);
 
@@ -172,14 +187,23 @@ public class Main {
 					command.run();
 				}
 			});
+			Thread mouseHookThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					SelectionToOCR.startOCR(ocrOpts, ocrHistory);
+				}
+			});
+			mouseHookThread.start();
 			ecs.submit(new Runnable() {
 				@Override
 				public void run() {
 					ii.start();
 				}
 			}, true);
+
 			if (ecs.take().get() != null) {
-				window.dispose();
+				closeAll(window);
+				mouseHookThread.join();
 			}
 
 			System.exit(0);
