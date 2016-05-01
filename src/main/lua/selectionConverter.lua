@@ -81,10 +81,10 @@ function convertHexSelection(threadObj)
 			)
 			if bytes ~= nil
 				and countDifferences({previousBytes, bytes})
-					> table.getn(bytes) * STABILIZATION_THRESHOLD
+					> getTableLength(bytes) * STABILIZATION_THRESHOLD
 			then
 				local s = ""
-				for i = 1, table.getn(bytes) do
+				for i = 1, getTableLength(bytes) do
 					s = s .. string.format("%02x", bytes[i])
 				end
 				sendText(s)
@@ -120,7 +120,7 @@ function getBytes(selectionContent, history, recurringHistory)
 			differences = countDifferences(history)
 		end
 
-		if differences > table.getn(bytes) * STABILIZATION_THRESHOLD then
+		if differences > getTableLength(bytes) * STABILIZATION_THRESHOLD then
 			return nil
 		end
 	end
@@ -130,13 +130,13 @@ end
 
 -- gets the minimum size of an array in a list
 function getMinSize(tables)
-	if tables == nil or table.getn(tables) == 0 then
+	if tables == nil or getTableLength(tables) == 0 then
 		return 0
 	end
-	local minSize = table.getn(tables[1]);
-	for i = 2, table.getn(tables) do
-		if table.getn(tables[i]) < minSize then
-			minSize = table.getn(tables[i])
+	local minSize = getTableLength(tables[1]);
+	for i = 2, getTableLength(tables) do
+		if getTableLength(tables[i]) < minSize then
+			minSize = getTableLength(tables[i])
 		end
 	end
 	return minSize
@@ -145,14 +145,14 @@ end
 -- count the number of different elements between arrays
 function countDifferences(tables)
 	local differenceCounter = 0;
-	for i = 1, table.getn(tables) - 1 do
+	for i = 1, getTableLength(tables) - 1 do
 		for j = 1, getMinSize(tables) do
 			if tables[i][j] ~= tables[i + 1][j] then
 				differenceCounter = differenceCounter + 1
 			end
 		end
 		differenceCounter = differenceCounter
-			+ math.abs(table.getn(tables[i]) - table.getn(tables[i+1]))
+			+ math.abs(getTableLength(tables[i]) - getTableLength(tables[i+1]))
 	end
 	return differenceCounter
 end
@@ -181,7 +181,7 @@ function constructHexFromHistory(history)
 	local res = {}
 	for j = 1, getMinSize(history) do
 		local bytesAtI = {}
-		for i = 1, table.getn(history) do
+		for i = 1, getTableLength(history) do
 			if bytesAtI[history[i][j]] == nil then
 				bytesAtI[history[i][j]] = 1
 			else
@@ -202,7 +202,7 @@ end
 -- pushes an elements at the first place of an array
 function pushFirst(array, elt, maxSize)
 	table.insert(array, 1, elt)
-	while table.getn(array) > maxSize do
+	while getTableLength(array) > maxSize do
 		table.remove(array, maxSize + 1)
 	end
 end
@@ -211,7 +211,7 @@ end
 -- taken from the official documentation
 function setfield(f, v)
 	local t = _G
-	for w, d in string.gfind(f, "([%w_]+)(.?)") do
+	for w, d in (string.gfind or string.gmatch)(f, "([%w_]+)(.?)") do
 		if d == "." then
 			t[w] = t[w] or {}
 			t = t[w]
@@ -284,9 +284,17 @@ end
 -- creates a menu item for HAT in CE's main form's "File" menu
 function addHATMenuItem()
 	local fileMenu = getMainForm().Menu.Items[0]
-	HAT_MENU_ITEM = createMenuItem(fileMenu) 
+	HAT_MENU_ITEM = createMenuItem(fileMenu)
 	HAT_MENU_ITEM.Caption = "Hook Any Text"
 	fileMenu.insert(0, HAT_MENU_ITEM)
+end
+
+function getTableLength(t)
+	if table.getn then
+		return table.getn(t)
+	else
+		return #t
+	end
 end
 
 addHATMenuItem()
