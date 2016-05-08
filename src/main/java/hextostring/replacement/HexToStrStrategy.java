@@ -1,6 +1,8 @@
 package hextostring.replacement;
 
 import java.nio.charset.Charset;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,7 +11,7 @@ import hextostring.utils.Hex;
 /**
  * Replaces hexadecimal sequences and patterns by readable characters between
  * minus signs. A string in such an intermediary state will be called an
- * transitory string.
+ * transitory string, or mixed string.
  *
  * @author Maxime PIA
  */
@@ -40,27 +42,45 @@ public class HexToStrStrategy extends ReplacementStrategy {
 	 * @return A completely readable string.
 	 */
 	public static String toReadableString(String s, Charset cs) {
-		// HACK: the final "-" ensures that all of s will be converted
+		List<String> parts = splitParts(s);
+		StringBuilder noHexString = new StringBuilder();
+		boolean hexPart = true;
+		for (String part : parts) {
+			if (hexPart) {
+				noHexString.append(Hex.convertToString(part, cs));
+			} else {
+				noHexString.append(part.replace("\\-", "-"));
+			}
+			hexPart = !hexPart;
+		}
+		return noHexString.toString();
+	}
+
+	/**
+	 * Split a transitory string into hex parts and readable parts, in the
+	 * order they were found. The first element of the result in always
+	 * a hex part, empty if necessary. Note that the minuses are removed.
+	 *
+	 * @param s
+	 * 			The string to be split up.
+	 * @return The parts of the split up string.
+	 */
+	public static List<String> splitParts(String s) {
+		// HACK: the final "-" ensures that all of s used
 		// in the while loop below.
 		s = s + "-";
 		Matcher m = Pattern.compile("(.*?)-").matcher(s);
-		StringBuilder noHexString = new StringBuilder();
+		LinkedList<String> parts = new LinkedList<>();
 		int previousEnd = 0;
-		boolean hexPart = true;
 		while (m.find()) {
 			String part = s.substring(previousEnd, m.end());
 			if (part.endsWith("\\-")) continue;
 
 			part = part.substring(0, part.length() - 1);
-			if (hexPart) {
-				noHexString.append(Hex.convertToString(part, cs));
-			} else {
-				noHexString.append(part);
-			}
+			parts.add(part);
 			previousEnd = m.end();
-			hexPart = !hexPart;
 		}
-		return noHexString.toString().replace("\\-", "-");
+		return parts;
 	}
 
 }

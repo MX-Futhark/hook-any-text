@@ -1,14 +1,14 @@
 package hextostring.convert;
 
 import java.nio.charset.Charset;
+import java.util.LinkedList;
 import java.util.List;
 
 import hextostring.ConvertOptions;
 import hextostring.debug.DebuggableLine;
 import hextostring.debug.DebuggableLineList;
 import hextostring.evaluate.EvaluatorFactory;
-import hextostring.evaluate.hex.HexStringEvaluator;
-import hextostring.evaluate.string.ReadableStringEvaluator;
+import hextostring.evaluate.string.StringEvaluator;
 import hextostring.replacement.HexToStrStrategy;
 import hextostring.replacement.ReplacementType;
 import hextostring.replacement.Replacements;
@@ -22,8 +22,7 @@ public abstract class AbstractConverter implements Converter {
 
 	private Charset charset;
 	private Replacements replacements;
-	private HexStringEvaluator hexStringEvaluator;
-	private ReadableStringEvaluator japaneseStringEvaluator;
+	private StringEvaluator japaneseStringEvaluator;
 
 	public AbstractConverter(Charset charset) {
 		setCharset(charset);
@@ -47,10 +46,8 @@ public abstract class AbstractConverter implements Converter {
 	 */
 	protected void setCharset(Charset charset) {
 		this.charset = charset;
-		this.hexStringEvaluator =
-			EvaluatorFactory.getHexStringEvaluatorInstance(charset);
 		this.japaneseStringEvaluator =
-			EvaluatorFactory.getReadableStringEvaluatorInstance();
+			EvaluatorFactory.getStringEvaluatorInstance();
 	}
 
 	@Override
@@ -88,37 +85,109 @@ public abstract class AbstractConverter implements Converter {
 	protected abstract List<String> extractConvertibleChunks(String hex);
 
 	/**
+	 * Calls extractConvertibleChunks of hex parts of a transitory string and
+	 * re-glue mixed parts together whenever possible.
+	 *
+	 * @param mixed
+	 * 			The transitory string
+	 * @return A list of convertible transitory strings.
+	 */
+	private List<String> extractConvertibleChunksFromMixedString(String mixed) {
+
+		List<String> result = new LinkedList<>();
+		List<String> parts = HexToStrStrategy.splitParts(mixed);
+		List<String> previousHexChunks = null;
+		String previousHexPart = null, previousReadablePart = null;
+		boolean hexPart = true, stringPreceded = false;
+
+		for (String part : parts) {
+
+			int lastIndex = result.size() - 1;
+
+			if (hexPart) {
+
+				List<String> chunks = extractConvertibleChunks(part);
+
+				if (chunks.size() > 0 && previousReadablePart != null) {
+					// the first chunk corresponds to the start of the hex part
+					boolean stringPrecedes = part.indexOf(chunks.get(0)) == 0;
+					if (stringPrecedes) {
+						result.set(
+							lastIndex,
+							result.get(lastIndex) + chunks.get(0)
+						);
+						chunks = chunks.subList(1, chunks.size());
+						stringPreceded = true;
+					} else {
+						stringPreceded = false;
+					}
+				}
+
+				result.addAll(chunks);
+				previousHexPart = part;
+				previousHexChunks = chunks;
+
+			} else {
+
+				part = "-" + part + "-"; // restore "-" removed by splitParts
+
+				boolean stringFollows = false;
+
+				if (previousHexChunks.size() + (stringPreceded ? 1 : 0) > 0) {
+					String lastChunk = result.get(lastIndex);
+					// the last chunk corresponds to the end of the hex part
+					stringFollows = previousHexPart.lastIndexOf(lastChunk)
+						+ lastChunk.length() == previousHexPart.length();
+					if (stringFollows) {
+						result.set(lastIndex, lastChunk + part);
+					}
+				}
+				if (!stringFollows) {
+					result.add(part);
+				}
+
+				previousReadablePart = part;
+			}
+
+			hexPart = !hexPart;
+		}
+
+		return result;
+	}
+
+	/**
 	 * Converts a hex string into several Japanese lines
 	 *
 	 * @param hex
 	 * 			A hex string copied from Cheat Engine's memory viewer.
 	 * @return The result of the conversion wrapped into a debuggable object.
 	 */
+	@Override
 	public DebuggableLineList convert(String hex) {
 		DebuggableLineList lines = new DebuggableLineList(preProcessHex(hex));
-		List<String> hexCollection =
-			extractConvertibleChunks(lines.getHexInput());
+		lines.setHexInputAfterHexReplacements(
+			replacements.apply(lines.getHexInput(), ReplacementType.HEX2HEX)
+		);
+		lines.setHexInputAfterStrReplacements(
+			replacements.apply(
+				lines.getHexInputAfterHexReplacements(),
+				ReplacementType.HEX2STR
+			)
+		);
+		List<String> hexCollection = extractConvertibleChunksFromMixedString(
+			lines.getHexInputAfterStrReplacements()
+		);
 		for (String hexChunk : hexCollection) {
 			DebuggableLine line = new DebuggableLine(hexChunk);
-			line.setHexAfterHexReplacements(
-				replacements.apply(hexChunk, ReplacementType.HEX2HEX)
-			);
-			line.setHexEvaluationResult(
-				hexStringEvaluator.evaluate(line.getHexAfterHexReplacements())
-			);
-			line.setHexAfterStrReplacements(replacements.apply(
-				line.getHexAfterHexReplacements(),
-				ReplacementType.HEX2STR
-			));
 			line.setReadableString(HexToStrStrategy.toReadableString(
-				line.getHexAfterStrReplacements(),
+				line.getHex(),
 				charset
 			));
 			line.setReadableStringAfterReplacements(replacements.apply(
 				line.getReadableString(),
 				ReplacementType.STR2STR
 			));
-			line.setReadableStringEvaluationResult(
+			line.setEvaluationResult(
 				japaneseStringEvaluator.evaluate(
 					line.getReadableStringAfterReplacements()
 				)

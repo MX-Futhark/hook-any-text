@@ -35,7 +35,7 @@ public class HexProcessor {
 	 * @param hex
 	 * 			The hexadecimal string.
 	 * @param forceUpdate
-	 * 			True if to the current value even if it is not warranted.
+	 * 			True to update the current value even if it is not warranted.
 	 * @return The converted string.
 	 */
 	public synchronized String convert(String hex, boolean forceUpdate) {

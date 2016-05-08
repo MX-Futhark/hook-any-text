@@ -12,7 +12,7 @@ import hextostring.evaluate.EvaluationResult;
  *
  * @author Maxime PIA
  */
-public class JapaneseStringEvaluator extends ReadableStringEvaluator {
+public class JapaneseStringEvaluator extends StringEvaluator {
 
 	// valid Japanese characters
 	public static final String JAPANESE_CHARS_REGEX =

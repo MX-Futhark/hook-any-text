@@ -15,13 +15,10 @@ import main.utils.StringUtils;
 public class DebuggableLine {
 
 	private String hex;
-	private String hexAfterHexReplacements;
-	private String hexAfterStrReplacements;
 	private String readableString;
 	private String readableStringAfterReplacements;
 
-	private EvaluationResult hexEvaluationResult;
-	private EvaluationResult readableStringEvaluationResult;
+	private EvaluationResult evaluationResult;
 
 	private String decorationBefore = "";
 	private String decorationAfter = "";
@@ -47,55 +44,8 @@ public class DebuggableLine {
 	 */
 	public void setHex(String hex) {
 		this.hex = hex;
-		setHexAfterHexReplacements(hex);
 	}
 
-	/**
-	 * Getter on the hex chunk from which this line originates to which HEX2HEX
-	 * replacements were applied.
-	 *
-	 * @return The hex chunk from which this line originates to which HEX2HEX
-	 * 		replacements were applied.
-	 */
-	public String getHexAfterHexReplacements() {
-		return hexAfterHexReplacements;
-	}
-
-	/**
-	 * Setter on the hex chunk from which this line originates to which HEX2HEX
-	 * replacements were applied.
-	 *
-	 * @param hexAfterHexReplacements
-	 * 			The hex chunk from which this line originates to which HEX2HEX
-	 * 			replacements were applied.
-	 */
-	public void setHexAfterHexReplacements(String hexAfterHexReplacements) {
-		this.hexAfterHexReplacements = hexAfterHexReplacements;
-		setHexAfterStrReplacements(hexAfterHexReplacements);
-	}
-
-	/**
-	 * Getter on the hex chunk from which this line originates to which HEX2HEX
-	 * & HEX2STR replacements were applied.
-	 *
-	 * @return The hex chunk from which this line originates to which HEX2HEX
-	 * 		& HEX2STR replacements were applied.
-	 */
-	public String getHexAfterStrReplacements() {
-		return hexAfterStrReplacements;
-	}
-
-	/**
-	 * Setter on the hex chunk from which this line originates to which HEX2HEX
-	 * & HEX2STR replacements were applied.
-	 *
-	 * @param hexAfterStrReplacements
-	 * 			The hex chunk from which this line originates to which HEX2HEX
-	 * 			& HEX2STR replacements were applied.
-	 */
-	public void setHexAfterStrReplacements(String hexAfterStrReplacements) {
-		this.hexAfterStrReplacements = hexAfterStrReplacements;
-	}
 
 	/**
 	 * Getter on the non-formatted string.
@@ -143,35 +93,12 @@ public class DebuggableLine {
 	}
 
 	/**
-	 * Getter on the evaluation result of the hex chunk from which this line
-	 * originates.
-	 *
-	 * @return The evaluation result of the hex chunk from which this line
-	 * originates.
-	 */
-	public EvaluationResult getHexEvaluationResult() {
-		return hexEvaluationResult;
-	}
-
-	/**
-	 * Setter on the evaluation result of the hex chunk from which this line
-	 * originates.
-	 *
-	 * @param hexEvaluationResult
-	 * 			The new evaluation result of the hex chunk from which this line
-	 * 			originates.
-	 */
-	public void setHexEvaluationResult(EvaluationResult hexEvaluationResult) {
-		this.hexEvaluationResult = hexEvaluationResult;
-	}
-
-	/**
 	 * Getter on the evaluation result of the non-formatted string.
 	 *
 	 * @return The evaluation result of the non-formatted string.
 	 */
-	public EvaluationResult getReadableStringEvaluationResult() {
-		return readableStringEvaluationResult;
+	public EvaluationResult getEvaluationResult() {
+		return evaluationResult;
 	}
 
 	/**
@@ -180,19 +107,17 @@ public class DebuggableLine {
 	 * @param readableStringEvaluationResult
 	 * 			The new evaluation result of the non-formatted string.
 	 */
-	public void setReadableStringEvaluationResult(
-		EvaluationResult readableStringEvaluationResult) {
-		this.readableStringEvaluationResult = readableStringEvaluationResult;
+	public void setEvaluationResult(EvaluationResult evaluationResult) {
+		this.evaluationResult = evaluationResult;
 	}
 
 	/**
-	 * Convenience getter on the total validity of this line.
+	 * Convenience getter on the validity of this line.
 	 *
 	 * @return The total validity of this line.
 	 */
 	public int getValidity() {
-		return this.hexEvaluationResult.getMark()
-			+ this.readableStringEvaluationResult.getMark();
+		return this.evaluationResult.getMark();
 	}
 
 	/**
@@ -228,44 +153,16 @@ public class DebuggableLine {
 		if ((debuggingFlags & DebuggingFlags.LINE_HEX_INPUT) > 0) {
 			sb.append("hex: \n0x" + hex + "\n");
 		}
-		if ((debuggingFlags & DebuggingFlags.LINE_HEX_AFTER_HEX_REPL_INPUT)
-			> 0) {
 
-			sb.append("hex after hex replacements: \n0x"
-				+ hexAfterHexReplacements + "\n");
-		}
-		if ((debuggingFlags & DebuggingFlags.LINE_HEX_AFTER_STR_REPL_INPUT)
-			> 0) {
-
-			sb.append("hex after str replacements: \n0x"
-				+ hexAfterStrReplacements + "\n");
-		}
-
-		if ((debuggingFlags & DebuggingFlags.LINE_HEX_VALIDITY) > 0) {
-			sb.append("hex validity: " + hexEvaluationResult.getMark() + "\n");
-			if ((debuggingFlags
-				& DebuggingFlags.LINE_HEX_VALIDITY_DETAILS)
-				== DebuggingFlags.LINE_HEX_VALIDITY_DETAILS) {
-				sb.append("details: \n");
-				sb.append(StringUtils.indent(
-					hexEvaluationResult.getDetails(),
-					"\t",
-					1
-				) + "\n");
-			}
-		}
-
-		if ((debuggingFlags & DebuggingFlags.LINE_STRING_VALIDITY) > 0) {
+		if ((debuggingFlags & DebuggingFlags.LINE_VALIDITY) > 0) {
 			sb.append("string validity: ");
-			sb.append(readableStringEvaluationResult.getMark() + "\n");
+			sb.append(evaluationResult.getMark() + "\n");
 			if ((debuggingFlags
-				& DebuggingFlags.LINE_STRING_VALIDITY_DETAILS)
-				== DebuggingFlags.LINE_STRING_VALIDITY_DETAILS) {
+				& DebuggingFlags.LINE_VALIDITY_DETAILS)
+				== DebuggingFlags.LINE_VALIDITY_DETAILS) {
 				sb.append("details: \n");
 				sb.append(StringUtils.indent(
-					readableStringEvaluationResult.getDetails(),
-					"\t",
-					1
+					evaluationResult.getDetails(), "\t", 1
 				) + "\n");
 			}
 		}

@@ -17,10 +17,9 @@ public class EncodingEvaluator implements Evaluator<DebuggableLineList> {
 
 	@Override
 	public EvaluationResult evaluate(DebuggableLineList lines) {
-		int mark =
-			lines.getTotalReadableStringValidity(LINE_VALIDITY_THRESHOLD);
+		int mark = lines.getTotalValidity(LINE_VALIDITY_THRESHOLD);
 		String details =
-			"Total validity of readable strings for elements with validity > "
+			"Total validity of strings for elements with validity > "
 			+ LINE_VALIDITY_THRESHOLD + " : " + mark;
 		return new EvaluationResult(mark, details);
 	}

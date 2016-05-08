@@ -14,6 +14,8 @@ import java.util.List;
 public class DebuggableLineList implements DebuggableStrings {
 
 	private String hexInput;
+	private String hexInputAfterHexReplacements;
+	private String hexInputAfterStrReplacements;
 	private List<DebuggableLine> lines = new LinkedList<>();
 
 	private String decorationBefore = "";
@@ -22,8 +24,11 @@ public class DebuggableLineList implements DebuggableStrings {
 
 	public DebuggableLineList(String hex) {
 		this.hexInput = hex;
+		this.hexInputAfterHexReplacements = hex;
+		this.hexInputAfterStrReplacements = hex;
 	}
 
+	@Override
 	public DebuggableLineList getValidLineList() {
 		return this;
 	}
@@ -45,6 +50,57 @@ public class DebuggableLineList implements DebuggableStrings {
 	 */
 	public String getHexInput() {
 		return hexInput;
+	}
+
+	/**
+	 * Getter on the hex input from which this line originates to which HEX2HEX
+	 * replacements were applied.
+	 *
+	 * @return The hex input from which this line originates to which HEX2HEX
+	 * 		replacements were applied.
+	 */
+	public String getHexInputAfterHexReplacements() {
+		return hexInputAfterHexReplacements;
+	}
+
+	/**
+	 * Setter on the hex input from which this line originates to which HEX2HEX
+	 * replacements were applied.
+	 *
+	 * @param hexInputAfterHexReplacements
+	 * 			The hex input from which this line originates to which HEX2HEX
+	 * 			replacements were applied.
+	 */
+	public void setHexInputAfterHexReplacements(
+		String hexInputAfterHexReplacements) {
+
+		this.hexInputAfterHexReplacements = hexInputAfterHexReplacements;
+		setHexInputAfterStrReplacements(hexInputAfterHexReplacements);
+	}
+
+	/**
+	 * Getter on the hex input from which this line originates to which HEX2HEX
+	 * & HEX2STR replacements were applied.
+	 *
+	 * @return The hex input from which this line originates to which HEX2HEX
+	 * 		& HEX2STR replacements were applied.
+	 */
+	public String getHexInputAfterStrReplacements() {
+		return hexInputAfterStrReplacements;
+	}
+
+	/**
+	 * Setter on the hex input from which this line originates to which HEX2HEX
+	 * & HEX2STR replacements were applied.
+	 *
+	 * @param hexInputAfterStrReplacements
+	 * 			The hex input from which this line originates to which HEX2HEX
+	 * 			& HEX2STR replacements were applied.
+	 */
+	public void setHexInputAfterStrReplacements(
+		String hexInputAfterStrReplacements) {
+
+		this.hexInputAfterStrReplacements = hexInputAfterStrReplacements;
 	}
 
 	/**
@@ -113,56 +169,21 @@ public class DebuggableLineList implements DebuggableStrings {
 	}
 
 	/**
-	 * Getter on the sum of the validity of all non-converted strings in the
-	 * list.
-	 *
-	 * @param filterUnder
-	 * 			The threshold below which a line is not counted in the result.
-	 * @return The sum of the validity of all non-converted strings in the list.
-	 */
-	public int getTotalHexValidity(int filterUnder) {
-		return getTotalValidity(true, filterUnder);
-	}
-
-	/**
 	 * Getter on the sum of the validity of all converted strings in the list.
 	 *
 	 * @param filterUnder
 	 * 			The threshold below which a line is not counted in the result.
 	 * @return The sum of the validity of all converted strings in the list.
 	 */
-	public int getTotalReadableStringValidity(int filterUnder) {
-		return getTotalValidity(false, filterUnder);
-	}
-
-	private int getTotalValidity(boolean hex, int filterUnder) {
+	public int getTotalValidity(int filterUnder) {
 		int total = 0;
 		for (DebuggableLine line : lines) {
-			int hexValidity = line.getHexEvaluationResult().getMark();
-			int readableStringValidity =
-				line.getReadableStringEvaluationResult().getMark();
-
-			if((hex ? hexValidity : readableStringValidity)
-					>= filterUnder) {
-
-				total += hex
-					? hexValidity
-					: readableStringValidity;
+			int validity = line.getValidity();
+			if(validity >= filterUnder) {
+				total += validity;
 			}
 		}
 		return total;
-	}
-
-	/**
-	 * Getter on the sum of the validity of all lines in the list.
-	 *
- 	 * @param filterUnder
-	 * 			The threshold below which a line is excluded from the total.
-	 * @return The sum of the validity of all lines in the list.
-	 */
-	public int getTotalValidity(int filterUnder) {
-		return getTotalHexValidity(filterUnder)
-			+ getTotalReadableStringValidity(filterUnder);
 	}
 
 	@Override
@@ -171,6 +192,19 @@ public class DebuggableLineList implements DebuggableStrings {
 
 		if ((debuggingFlags & DebuggingFlags.LINE_LIST_HEX_INPUT) > 0) {
 			sb.append("input: 0x" + hexInput + "\n");
+		}
+		if ((debuggingFlags & DebuggingFlags.LINE_LIST_HEX_AFTER_HEX_REPL_INPUT)
+			> 0) {
+
+			sb.append("input after hex replacements: \n0x"
+				+ hexInputAfterHexReplacements + "\n");
+		}
+		if ((debuggingFlags
+			& DebuggingFlags.LINE_LIST_HEX_AFTER_STR_REPL_INPUT)
+			> 0) {
+
+			sb.append("input after str replacements: \n0x"
+				+ hexInputAfterStrReplacements + "\n");
 		}
 
 		List<DebuggableLine> displayedLines;

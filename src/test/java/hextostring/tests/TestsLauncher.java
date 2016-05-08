@@ -72,6 +72,7 @@ import main.options.domain.ValueOutOfDomainException;
  *     |-...
  *
  * It is assumed that all .txt files are encoded in UTF-8, without the BOM.
+ * Their newline is always LF, never CR or CRLF
  *
  * @author Maxime PIA
  */
@@ -133,6 +134,11 @@ public class TestsLauncher {
 					: opts.getStrictness()
 			);
 			out.print(inputFile.getName(), indentLevel);
+
+			// introduce tolerance to newline discrepancies
+			String cr = new String(Character.toChars(0xD));
+			String lf = new String(Character.toChars(0xA));
+			actualOutput = actualOutput.replace(cr + lf, lf).replace(cr, lf);
 
 			if (expectedOutput.equals(actualOutput)) {
 				out.println(" OK");

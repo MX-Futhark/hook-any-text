@@ -27,9 +27,9 @@ public class ConvertOptions extends Options implements Serializable {
 	/**
 	 * Backward-compatible with 0.7.0
 	 */
-	private static final long serialVersionUID = 00000000007000000L;
+	private static final long serialVersionUID = 00000000007000001L;
 
-	public static final int DEFAULT_STRICTNESS = 50;
+	public static final int DEFAULT_STRICTNESS = 35;
 	public static final Charset DEFAULT_CHARSET = Charsets.DETECT;
 	public static final boolean DEFAULT_AUTOCOPY = true;
 	public static final Replacements DEFAULT_REPLACEMENTS = new Replacements();
