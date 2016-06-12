@@ -151,6 +151,8 @@ public class Main {
 
 				opts.parseArgs(args);
 			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+				serializationWarning = true;
 				opts = new MainOptions(args);
 			}
 			attachSerializeOnClose(opts, hpc);

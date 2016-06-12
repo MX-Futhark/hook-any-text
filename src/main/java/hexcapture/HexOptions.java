@@ -9,7 +9,7 @@ import main.options.domain.Bounds;
 import main.options.domain.Values;
 
 /**
- * Options for the cript capturing the hexadecimal selection in Cheat Engine.
+ * Options for the script capturing the hexadecimal selection in Cheat Engine.
  *
  * @author Maxime PIA
  */

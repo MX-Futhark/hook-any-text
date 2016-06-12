@@ -466,11 +466,9 @@ public abstract class Options {
 	/**
 	 * Getter on the value class of a configurable member.
 	 *
-	 * @param @param argField
+	 * @param argField
 	 * 			The configurable member.
 	 * @return The value class of the configurable member.
-	 * @param argField
-	 * @return
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws NoSuchFieldException
