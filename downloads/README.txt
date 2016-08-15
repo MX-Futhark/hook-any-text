@@ -114,6 +114,12 @@
   Changelog
   ---------
 
+  0.8.0 - 2015-08-15
+  - Fixed cmd.exe starting upon opening Cheat Egine
+  - Fixed use of deprecated lua functions
+  - Fixed hex replacements not done in time
+  - Fixed warning message not popping up in case of version change
+
  0.7.0 - 2015-11-01
   - Added pattern substitutions
   - Fixed exceptions due to version inconsistencies
