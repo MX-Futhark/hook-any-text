@@ -104,3 +104,10 @@ Test files are put into the tests directory. Its architecture is as follows:
 
           
 The main test class hextostring.tests.TestsLauncher assumes that all .txt files are encoded in UTF-8, without the BOM.
+
+
+### Manual integration testing
+
+It is possible it avoid going through the pain of opening a game in Cheat Engine to test `src/main/lua/selectionConverter.lua` by running `src/test/lua/selectionConverter.lua` in a terminal and simulating hex selections through it. More instructions are provided directly in this file.
+
+Note that this shortcut does not replace a full end-to-end test, but it is handy to reduce the error feedback cycle when working on `selectionConverter.lua`.
