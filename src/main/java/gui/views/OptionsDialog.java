@@ -281,18 +281,21 @@ public class OptionsDialog extends JDialog {
 
 	private static JComponent getJSpinner(Object value, Bounds<?> domain) {
 		JSpinner spinner = new JSpinner();
-		SpinnerNumberModel model = new SpinnerNumberModel();
-		spinner.setModel(model);
-		model.setStepSize(
-			value.getClass().equals(Integer.class)
-				? INTEGER_SPINNER_STEP
-				: DOUBLE_SPINNER_STEP
-		);
+		SpinnerNumberModel model;
+		double min = 0d, max = 1d;
+
 		if (domain != null) {
-			model.setMinimum(domain.getMin());
-			model.setMaximum(domain.getMax());
+			min = ((Number) domain.getMin()).doubleValue();
+			max = ((Number) domain.getMax()).doubleValue();
 		}
-		spinner.setValue(value);
+
+		if (value.getClass().equals(Integer.class)) {
+			model = new SpinnerNumberModel((int) value, (int) min, (int) max, INTEGER_SPINNER_STEP);
+		} else {
+			model = new SpinnerNumberModel((double) value, min, max, DOUBLE_SPINNER_STEP);
+		}
+
+		spinner.setModel(model);
 		return spinner;
 	}
 
