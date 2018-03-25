@@ -43,7 +43,7 @@ public enum HexUpdateStrategies implements ValueClass {
 	COMBINED;
 
 	@Override
-    public String toString() {
-        return this.name().toLowerCase();
-    }
+	public String toString() {
+		return this.name().toLowerCase();
+	}
 }

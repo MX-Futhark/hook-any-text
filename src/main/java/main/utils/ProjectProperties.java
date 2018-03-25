@@ -25,7 +25,7 @@ public class ProjectProperties {
 		if (propsLoaded) return;
 
 		InputStream versionStream =
-	    	ProjectProperties.class.getResourceAsStream("/about.prop");
+			ProjectProperties.class.getResourceAsStream("/about.prop");
 		props.load(versionStream);
 		versionStream.close();
 		propsLoaded = true;

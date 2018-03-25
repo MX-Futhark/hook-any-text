@@ -1,8 +1,8 @@
 package gui.views;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
@@ -28,7 +27,12 @@ import javax.swing.table.DefaultTableModel;
 import gui.actions.OptionsDialogActions;
 import gui.utils.GUIErrorHandler;
 import gui.utils.Images;
+import gui.views.components.HexSelectionsTable;
 import gui.views.components.ReplacementsTable;
+import gui.views.components.TablePanel;
+import gui.views.models.TableViewModel;
+import hexcapture.HexSelection;
+import hexcapture.HexSelections;
 import hextostring.replacement.Replacements;
 import main.MainOptions;
 import main.options.Options;
@@ -90,8 +94,12 @@ public class OptionsDialog extends JDialog {
 
 			new GUIErrorHandler(e);
 		}
-		tabs.add("replacements", getReplacementsPanel(
+		tabs.add("Replacements", getReplacementsPanel(
 			opts.getConvertOptions().getReplacements(),
+			acts
+		));
+		tabs.add("Selections", getHexSelectionsPanel(
+			opts.getHexOptions().getHexSelections(),
 			acts
 		));
 		return tabs;
@@ -159,10 +167,10 @@ public class OptionsDialog extends JDialog {
 
 		if (!empty) {
 			tabs.add(
-				StringUtils.camelToWords(
+				StringUtils.capitalize(StringUtils.camelToWords(
 					optionObject.getClass().getSimpleName()
 						.replace("Options", "")
-				),
+				)),
 				optionPanel
 			);
 		}
@@ -174,30 +182,83 @@ public class OptionsDialog extends JDialog {
 	private JPanel getReplacementsPanel(Replacements replacements,
 		OptionsDialogActions acts) {
 
-		JPanel replacementsPanel = new JPanel(new BorderLayout());
 		final ReplacementsTable replacementsTable =
 			new ReplacementsTable(replacements, acts);
-		replacementsPanel.add(
-			new JScrollPane(replacementsTable),
-			BorderLayout.CENTER
-		);
 
-		JPanel buttonsPanel = new JPanel(new FlowLayout());
 		JButton addReplacementButton = new JButton("Add replacement");
-		acts.setAddReplacementButtonAction(
-			addReplacementButton,
-			(DefaultTableModel) replacementsTable.getModel()
-		);
-		buttonsPanel.add(addReplacementButton);
-		JButton deleteSelectionButton = new JButton("Delete selection");
-		acts.setDeleteSelectionButtonAction(
-			deleteSelectionButton,
+		acts.setAddRowButtonAction(addReplacementButton, replacementsTable);
+		JButton deleteSelectedButton = new JButton("Delete selected");
+		acts.setDeleteSelectedButtonAction(
+			deleteSelectedButton,
 			replacementsTable
 		);
-		buttonsPanel.add(deleteSelectionButton);
 
-		replacementsPanel.add(buttonsPanel, BorderLayout.SOUTH);
-		return replacementsPanel;
+		return new TablePanel(replacementsTable, new Component[]{
+			addReplacementButton, deleteSelectedButton
+		});
+	}
+
+	private JPanel getHexSelectionsPanel(HexSelections selections,
+		final OptionsDialogActions acts) {
+
+		final HexSelectionsTable selectionsTable =
+			new HexSelectionsTable(selections, acts);
+
+		// FIXME: We're duplicating the logic of the observable HexSelections
+		// into the UI here... OptionsDialogActions.setTableModelActions should
+		// be modified instead (but the fact that changes are taken into
+		// account lazily is difficult to reconcile with the eagerly observable
+		// nature of HexSelections)
+		final Runnable setLastRadioOn = new Runnable() {
+
+			@Override
+			public void run() {
+				TableViewModel<HexSelection> viewModel =
+					selectionsTable.getViewModel();
+				int column = -1;
+				while (viewModel.getColumnClass(++column) != Boolean.class) {}
+				acts.applyRadioAction(
+					selectionsTable,
+					((DefaultTableModel) selectionsTable.getModel())
+						.getRowCount() - 1,
+					column
+				);
+			}
+		};
+
+		JButton addSelectionButton = new JButton("Add selection");
+		acts.setAddRowButtonAction(
+			addSelectionButton,
+			selectionsTable,
+			setLastRadioOn
+		);
+
+		JButton deleteSelectedButton = new JButton("Delete selected");
+		acts.setDeleteSelectedButtonAction(deleteSelectedButton,
+			selectionsTable, 1, new Runnable() {
+
+			@Override
+			public void run() {
+				DefaultTableModel model =
+					(DefaultTableModel) selectionsTable.getModel();
+				int activeRadioIndex = -1;
+				for (int i = 0; i < model.getRowCount(); ++i) {
+					for (int j = 0; j < model.getColumnCount(); ++j) {
+						Object v = model.getValueAt(i, j);
+						if (v != null && v.equals(Boolean.TRUE)) {
+							activeRadioIndex = i;
+						}
+					}
+				}
+				if (activeRadioIndex == -1) {
+					setLastRadioOn.run();
+				}
+			}
+		});
+
+		return new TablePanel(selectionsTable, new Component[]{
+			addSelectionButton, deleteSelectedButton
+		});
 	}
 
 	// Flags are managed differently: every flag corresponds to a checkbox.
@@ -243,9 +304,9 @@ public class OptionsDialog extends JDialog {
 
 		if (!empty) {
 			tabs.add(
-				StringUtils.camelToWords(
+				StringUtils.capitalize(StringUtils.camelToWords(
 					flagField.getName().replace("Flags", "")
-				),
+				)),
 				flagPanel
 			);
 		}

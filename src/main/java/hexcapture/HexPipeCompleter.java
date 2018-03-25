@@ -20,7 +20,8 @@ public class HexPipeCompleter {
 
 	public static final String FILENAME = "hex_config";
 
-	public static final String HAT_IS_RUNNING = "HAT_IS_RUNNING";
+	public static final String HEX_SELECTIONS = "HEX_SELECTIONS";
+	public static final String CLOSE_REQUESTED = "CLOSE_REQUESTED";
 
 	/**
 	 * Updates options affecting the behavior of the main lua script.
@@ -42,10 +43,12 @@ public class HexPipeCompleter {
 		List<Method> getters =
 			ReflectionUtils.getGetters(hexOptions.getClass());
 		for (Method getter : getters) {
-			writer.println(
-				StringUtils.camelToScreamingSnake(getter.getName().substring(3))
-					+ "=" + getter.invoke(hexOptions)
-			);
+			writer.println(getKeyValueString(
+				StringUtils.camelToScreamingSnake(
+					getter.getName().substring(3)
+				),
+				getter.invoke(hexOptions)
+			));
 		}
 		writer.close();
 	}
@@ -59,8 +62,11 @@ public class HexPipeCompleter {
 	public void closeHandle() throws FileNotFoundException, IOException {
 		PrintWriter writer =
 			new PrintWriter(IOUtils.getFileInTempDirectory(FILENAME));
-		writer.println(HAT_IS_RUNNING + "=false");
+		writer.println(getKeyValueString(CLOSE_REQUESTED, true));
 		writer.close();
+	}
 
+	private String getKeyValueString(String key, Object value) {
+		return key + "=" + value.toString();
 	}
 }

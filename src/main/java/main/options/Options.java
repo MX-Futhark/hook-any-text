@@ -41,7 +41,8 @@ import main.utils.StringUtils;
  *
  * If the version of the project is XXXXX.YYYYY.ZZZZZ, the serialVersionUID
  * attribute of serializable option classes must respect the following format:
- * XXXXX0YYYYY0ZZZZZL
+ * 10XXXXX0YYYYY0ZZZZZL (note: pre-0.8.0 versions where noted in octal without
+ * the "10-" prefix.
  *
  * The usual default value of a member is indicated as follows:
  * Naming convention: "DEFAULT_" + the member's type in SCREAMING_SNAKE_CASE

@@ -3,6 +3,8 @@ package hextostring.debug;
 import java.util.LinkedList;
 import java.util.List;
 
+import hextostring.format.DecorableList;
+
 /**
  * Wraps all the necessary information to debug list of lines:
  *  - the original hex input
@@ -11,7 +13,7 @@ import java.util.List;
  *
  * @author Maxime PIA
  */
-public class DebuggableLineList implements DebuggableStrings {
+public class DebuggableLineList implements DebuggableStrings, DecorableList {
 
 	private String hexInput;
 	private String hexInputAfterHexReplacements;
@@ -29,7 +31,7 @@ public class DebuggableLineList implements DebuggableStrings {
 	}
 
 	@Override
-	public DebuggableLineList getValidLineList() {
+	public DebuggableLineList getDecorableList() {
 		return this;
 	}
 
@@ -129,6 +131,7 @@ public class DebuggableLineList implements DebuggableStrings {
 	 * @param decorationBefore
 	 * 			The string put before these lines in the toString method.
 	 */
+	@Override
 	public void setDecorationBefore(String decorationBefore) {
 		this.decorationBefore = decorationBefore;
 	}
@@ -139,6 +142,7 @@ public class DebuggableLineList implements DebuggableStrings {
 	 * @param decorationBetween
 	 * 			The string put between these lines in the toString method.
 	 */
+	@Override
 	public void setDecorationBetween(String decorationBetween) {
 		this.decorationBetween = decorationBetween;
 	}
@@ -149,6 +153,7 @@ public class DebuggableLineList implements DebuggableStrings {
 	 * @param decorationAfter
 	 * 			The string put after these lines in the toString method.
 	 */
+	@Override
 	public void setDecorationAfter(String decorationAfter) {
 		this.decorationAfter = decorationAfter;
 	}
@@ -161,6 +166,7 @@ public class DebuggableLineList implements DebuggableStrings {
 	 * @param after
 	 * 			The string put after every line in the toString method.
 	 */
+	@Override
 	public void setLinesDecorations(String before, String after) {
 		for (DebuggableLine line : lines) {
 			line.setDecorationBefore(before);

@@ -7,12 +7,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import gui.views.models.TableData;
+
 /**
  * A collection of replacements
  *
  * @author Maxime PIA
  */
-public class Replacements implements Serializable {
+public class Replacements
+	implements TableData<Replacement>, Serializable {
 
 	/**
 	 * Backward-compatible with 0.7.0
@@ -31,24 +34,25 @@ public class Replacements implements Serializable {
 	}
 
 	/**
-	 * Getter on the replacements.
-	 * The content of the list must not be modified.
-	 *
-	 * @return The replacements.
-	 */
-	public List<Replacement> getAll() {
-		return orderedReplacements;
-	}
-
-	/**
 	 * Getter on a replacement by its index.
 	 *
 	 * @param index
 	 * 			The index of the replacement.
 	 * @return The replacement at the specified index.
 	 */
+	@Override
 	public Replacement get(int index) {
 		return orderedReplacements.get(index);
+	}
+
+	/**
+	 * Getter on the replacements.
+	 *
+	 * @return The replacements.
+	 */
+	@Override
+	public List<Replacement> getAll() {
+		return new ArrayList<Replacement>(orderedReplacements);
 	}
 
 	/**
@@ -57,6 +61,7 @@ public class Replacements implements Serializable {
 	 * @param r
 	 * 			The replacement to add.
 	 */
+	@Override
 	public void add(Replacement r) {
 		orderedReplacements.add(r);
 		replacementsByType.get(r.getType()).add(r);
@@ -68,6 +73,7 @@ public class Replacements implements Serializable {
 	 * @param index
 	 * 			The index of the replacement to remove.
 	 */
+	@Override
 	public void remove(int index) {
 		Replacement deleted = orderedReplacements.remove(index);
 		replacementsByType.get(deleted.getType()).remove(deleted);

@@ -1,7 +1,5 @@
 package hextostring.format;
 
-import hextostring.debug.DebuggableLineList;
-
 /**
  * Abstract formatter.
  * Formatters add the final details to conversion results.
@@ -33,11 +31,7 @@ public abstract class Formatter {
 	 * @param lines
 	 * 			A List of lines.
 	 */
-	public void format(DebuggableLineList lines) {
-		decorateLines(lines);
-	}
-
-	private void decorateLines(DebuggableLineList lines) {
+	public void format(DecorableList lines) {
 		lines.setDecorationBefore(linesDecorationBefore);
 		lines.setDecorationBetween(linesDecorationBetween);
 		lines.setDecorationAfter(linesDecorationAfter);

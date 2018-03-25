@@ -8,14 +8,16 @@
 
 -- helpers
 
--- FIXME: Upon exiting, the error message is buried in infinite
--- "Line not found" messages, hence the force kill.
+--- Exits the process
 local exitProcess = function()
+	-- FIXME: Upon exiting, the error message is buried in infinite
+	-- "Line not found" messages, hence the force kill.
 	os.execute("taskkill /f /t /im lua*>nul 2>nul")
 end
 
 local conversionLoopCoroutine
 
+--- Resumes the conversion loop
 local resumeConversionLoopCoroutine = function()
 	local ok, errorMsg = coroutine.resume(conversionLoopCoroutine)
 	if not ok then
@@ -25,6 +27,9 @@ local resumeConversionLoopCoroutine = function()
 	end
 end
 
+--- Splits a string by space
+-- @param inputstr The string to split
+-- @return An array of strings
 local split = function(inputstr)
 	local t = {} ; i = 1
 	for str in string.gmatch(inputstr, "([^%s]+)") do
@@ -37,9 +42,12 @@ end
 
 -- global mocks
 
+local CheatEngine = _G
+
 local mockMemoryZone = io.open(arg[1], "r")
 local mockMemoryZoneContent = mockMemoryZone:read("*all")
 
+--- See Cheat Engine's doc
 createNativeThread = function(f)
 	conversionLoopCoroutine = coroutine.create(f)
 	resumeConversionLoopCoroutine()
@@ -47,11 +55,13 @@ end
 
 local memViewForm = {}
 memViewForm.HexadecimalView = {}
-getMemoryViewForm = function()
+--- See Cheat Engine's doc
+CheatEngine.getMemoryViewForm = function()
 	return memViewForm
 end
 
-getMainForm = function()
+--- See Cheat Engine's doc
+CheatEngine.getMainForm = function()
 	local form = {}
 	form.Menu = {}
 	form.Menu.Items = {}
@@ -61,11 +71,13 @@ getMainForm = function()
 	return form
 end
 
-createMenuItem = function()
+--- See Cheat Engine's doc
+CheatEngine.createMenuItem = function()
 	return {}
 end
 
-readBytes = function(start, length)
+--- See Cheat Engine's doc
+CheatEngine.readBytes = function(start, length)
 	local textSelection = mockMemoryZoneContent:sub(start, start + length)
 	local bytes = {}
 	for i = 1, #textSelection do
@@ -76,16 +88,28 @@ readBytes = function(start, length)
 	return bytes
 end
 
-getCheatEngineDir = function()
+--- See Cheat Engine's doc
+CheatEngine.getCheatEngineDir = function()
 	return "..\\..\\..\\"
 end
 
+--- See Cheat Engine's doc
+CheatEngine.closeCE = function()
+	exitProcess()
+end
+
 local clock = os.clock
-sleep = function(n)
+--- See Cheat Engine's doc
+CheatEngine.sleep = function(n)
+	-- needed to avoid the current prompt being hidden
+	os.execute("title cheatEngineMock")
+
 	if n == nil then
 		n = 1000
 	end
 	local t0 = clock()
+	-- NOTE: milliseconds are not natively supported, the argument must be
+	--       ceiled to the next second
 	while clock() - t0 <= math.ceil(n / 1000) do end
 end
 
@@ -99,9 +123,6 @@ hexViewMt.__index = function(table, key)
 		if canReceiveInputs then
 			io.write("> ")
 		else
-			-- needed to avoid the current prompt being hidden
-			os.execute("title cheatEngineMock")
-
 			canReceiveInputs = true
 		end
 		coroutine.yield()
@@ -123,7 +144,7 @@ os.execute(
 )
 
 dofile("..\\..\\main\\lua\\selectionConverter.lua")
-sleep(2000)
+CheatEngine.sleep(2000)
 resumeConversionLoopCoroutine()
 
 local hexView = memViewForm.HexadecimalView
@@ -134,12 +155,16 @@ while command ~= "exit" do
 	hexView.SelectionStop = tonumber(elts[2])
 	hasSelection = hexView.SelectionStart < hexView.SelectionStop
 	resumeConversionLoopCoroutine()
+	if (coroutine.status(conversionLoopCoroutine) == "dead") then
+		print("selectionConverter has exited")
+		exitProcess()
+	end
 	hasConfigBeenRead = true
 	command = io.read()
 end
 mockMemoryZone:close()
 
 os.execute("taskkill /f /fi \"WINDOWTITLE eq Hook Any Text\" >nul")
-sleep(1000)
+CheatEngine.sleep(1000)
 os.execute("rmdir /s /q ..\\..\\..\\autorun")
 exitProcess()

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
+import hexcapture.HexSelectionsContentSnapshot;
+
 public class History extends Observable {
 
 	public static final int HISTORY_MAX_SIZE = 100;
@@ -15,7 +17,9 @@ public class History extends Observable {
 		return content.peek();
 	}
 
-	public synchronized void add(String input, String output) {
+	public synchronized void add(HexSelectionsContentSnapshot input,
+		String output) {
+
 		content.addFirst(new InputOutputPair(input, output));
 		if (content.size() > HISTORY_MAX_SIZE) {
 			content.removeLast();

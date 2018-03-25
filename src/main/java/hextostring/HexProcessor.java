@@ -1,7 +1,12 @@
 package hextostring;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import hexcapture.HexSelectionsContentSnapshot;
 import hextostring.convert.Converter;
 import hextostring.convert.ConverterFactory;
+import hextostring.debug.DebuggableHexSelectionsContent;
 import hextostring.debug.DebuggableStrings;
 import hextostring.format.Formatter;
 import hextostring.format.FormatterFactory;
@@ -22,7 +27,10 @@ public class HexProcessor {
 	private History history;
 	private ConvertOptions opts;
 
-	private Formatter formatter = FormatterFactory.getFormatterInstance(false);
+	private Formatter standardFormatter =
+		FormatterFactory.getFormatterInstance(FormatterFactory.STANDARD);
+	private Formatter multiContentFormatter =
+		FormatterFactory.getFormatterInstance(FormatterFactory.MULTI_CONTENT);
 
 	public HexProcessor(ConvertOptions opts, History history) {
 		this.history = history;
@@ -32,28 +40,48 @@ public class HexProcessor {
 	/**
 	 * Converts an hexadecimal string into a readable string.
 	 *
-	 * @param hex
-	 * 			The hexadecimal string.
+	 * @param selectionsContent
+	 * 			An object mapping hex selections to the hex values they contain
+	 * 			and that must be updated.
 	 * @param forceUpdate
 	 * 			True to update the current value even if it is not warranted.
 	 * @return The converted string.
 	 */
-	public synchronized String convert(String hex, boolean forceUpdate) {
+	public synchronized String convert(
+		HexSelectionsContentSnapshot selectionsContent, boolean forceUpdate) {
+
 		Converter converter = ConverterFactory.getConverterInstance(
 			opts.getCharset(),
 			opts.getReplacements()
 		);
-		DebuggableStrings ds = converter.convert(hex);
-		formatter.format(ds.getValidLineList());
-		String result = ds.toString(
+		List<DebuggableStrings> conversionResults = new LinkedList<>();
+
+		for (int i = 0; i < selectionsContent.getSize(); ++i) {
+			String content = selectionsContent.getValueAt(i);
+			if (content != null && !content.isEmpty()) {
+				DebuggableStrings ds = converter.convert(content);
+				standardFormatter.format(ds.getDecorableList());
+				conversionResults.add(ds);
+			} else {
+				conversionResults.add(null);
+			}
+		}
+		DebuggableHexSelectionsContent dhsc =
+			new DebuggableHexSelectionsContent(
+				selectionsContent,
+				conversionResults
+			);
+		multiContentFormatter.format(dhsc.getDecorableList());
+		String result = dhsc.toString(
 			opts.getDebuggingFlags(),
 			opts.getStrictness()
 		);
+
 		// avoid unnecessarily updating the clipboard
 		if ((!result.equals(previousResult) && result.length() > 0)
 			|| forceUpdate) {
 
-			history.add(hex, result);
+			history.add(selectionsContent, result);
 			if (opts.isAutocopy()) {
 				Clipboard.set(result);
 			}

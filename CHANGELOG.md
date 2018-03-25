@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 0.9.0 - 2018-04-01
+- Fixed #13
+- Fixed #14
+- Added sticky hex selection and multi hex selections
+
 ## 0.8.0 - 2015-08-15
 - Fixed #4
 - Fixed #12

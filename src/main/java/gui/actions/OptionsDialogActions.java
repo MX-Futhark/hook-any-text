@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Observable;
 import java.util.Queue;
 
 import javax.swing.JButton;
@@ -21,7 +22,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -29,12 +29,11 @@ import javax.swing.table.DefaultTableModel;
 
 import gui.utils.GUIErrorHandler;
 import gui.views.OptionsDialog;
-import gui.views.components.ReplacementsTable;
+import gui.views.models.TableData;
+import gui.views.models.TableViewModel;
+import gui.views.models.TableViewModelOwner;
 import hexcapture.HexOptions;
 import hexcapture.HexPipeCompleter;
-import hextostring.replacement.Replacement;
-import hextostring.replacement.ReplacementType;
-import hextostring.replacement.Replacements;
 import main.MainOptions;
 import main.options.Options;
 import main.utils.ReflectionUtils;
@@ -44,7 +43,7 @@ import main.utils.ReflectionUtils;
  *
  * @author Maxime PIA
  */
-public class OptionsDialogActions {
+public class OptionsDialogActions extends Observable {
 
 
 	// Equivalent of runnable that can throw exceptions.
@@ -61,12 +60,12 @@ public class OptionsDialogActions {
 	private static final Queue<ModificationAction> optionModifications =
 		new LinkedList<>();
 
-	private static final HexPipeCompleter ccw =
+	private static final HexPipeCompleter hpc =
 		new HexPipeCompleter();
 	private static boolean hexOptionsModified = false;
 
-
 	private OptionsDialog optionsDialog;
+	private boolean modificationsOngoing = false;
 
 	public OptionsDialogActions(OptionsDialog optionsDialog) {
 		this.optionsDialog = optionsDialog;
@@ -229,20 +228,41 @@ public class OptionsDialogActions {
 	/**
 	 * Sets the action for the "add replacement" button.
 	 *
-	 * @param addReplacementButton
+	 * @param addRowButton
 	 * 			The button.
 	 * @param tableModel
 	 * 			The model of the table containing the replacements.
 	 */
-	public void setAddReplacementButtonAction(JButton addReplacementButton,
-		final DefaultTableModel tableModel) {
+	@SuppressWarnings("rawtypes")
+	public void setAddRowButtonAction(JButton addRowButton,
+		TableViewModelOwner table) {
 
-		addReplacementButton.addActionListener(new ActionListener(){
+		setAddRowButtonAction(addRowButton, table, null);
+	}
+
+	/**
+	 * Sets the action for the "add replacement" button.
+	 *
+	 * @param addRowButton
+	 * 			The button.
+	 * @param tableModel
+	 * 			The model of the table containing the replacements.
+	 * @param additionalAction
+	 * 			Something to do in addition to adding a row.
+	 */
+	@SuppressWarnings("rawtypes")
+	public void setAddRowButtonAction(JButton addRowButton,
+		final TableViewModelOwner table, final Runnable additionalAction) {
+
+		addRowButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tableModel.addRow(
-					new Object[]{new Replacement(ReplacementType.STR2STR)}
+				((DefaultTableModel) table.getModel()).addRow(
+					new Object[]{table.getViewModel().getNewRowDefaultModel()}
 				);
+				if (additionalAction != null) {
+					additionalAction.run();
+				}
 			}
 		});
 	}
@@ -250,36 +270,53 @@ public class OptionsDialogActions {
 	/**
 	 * Sets the action for the "delete selection" button.
 	 *
-	 * @param addReplacementButton
+	 * @param deleteSelectedButton
 	 * 			The button.
 	 * @param tableModel
 	 * 			The model of the table containing the replacements.
 	 */
-	public void setDeleteSelectionButtonAction(JButton deleteSelectionButton,
-		final JTable table) {
+	public void setDeleteSelectedButtonAction(JButton deleteSelectedButton,
+		final TableViewModelOwner<?> table) {
 
-		deleteSelectionButton.addActionListener(new ActionListener(){
+		setDeleteSelectedButtonAction(deleteSelectedButton, table, 0, null);
+	}
+
+	/**
+	 * Sets the action for the "delete selection" button.
+	 *
+	 * @param deleteSelectedButton
+	 * 			The button.
+	 * @param tableModel
+	 * 			The model of the table containing the replacements.
+	 * @param minRowCount
+	 * 			Minimal number of rows
+	 * @param additionalAction
+	 * 			Something to do in addition to deleting rows.
+	 */
+	public void setDeleteSelectedButtonAction(JButton deleteSelectedButton,
+		// FIXME: minRowCount is hackish
+		final TableViewModelOwner<?> table, final int minRowCount,
+		final Runnable additionalAction) {
+
+		deleteSelectedButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int[] selectedInterval = table.getSelectedRows();
+				if (selectedInterval.length == 0) return;
+
 				int firstRowIndex = selectedInterval[0];
 				int intervalSize = selectedInterval.length;
 				DefaultTableModel model = (DefaultTableModel) table.getModel();
 				for (int i = 0; i < intervalSize; ++i) {
-					model.removeRow(firstRowIndex);
+					if (model.getRowCount() > minRowCount) {
+						model.removeRow(firstRowIndex);
+					}
+				}
+				if (additionalAction != null) {
+					additionalAction.run();
 				}
 			}
 		});
-	}
-
-	private static Object[] replacementToArray(Replacement r) {
-		return new Object[]{
-			r.getSequence(),
-			r.getReplacement(),
-			r.isEscapeCharacters(),
-			r.isInterpretAsPattern(),
-			r.getType()
-		};
 	}
 
 	/**
@@ -287,24 +324,26 @@ public class OptionsDialogActions {
 	 *
 	 * @param table
 	 * 			The table containing the replacements.
-	 * @param columnNames
-	 * 			The titles of the columns.
-	 * @param replacements
-	 * 			The replacements managed by the table.
+	 * @param isHexOptionsRelated
+	 * 			True if the content of the table is part of HexOptions.
 	 */
-	@SuppressWarnings("serial")
-	public void setReplacementTableModelActions(final ReplacementsTable table,
-		String[] columnNames, final Replacements replacements) {
+	@SuppressWarnings({ "serial", "rawtypes" })
+	public void setTableModelActions(final TableViewModelOwner table,
+		boolean isHexOptionsRelated) {
 
-		table.setModel(new DefaultTableModel(columnNames, 0) {
+		@SuppressWarnings("unchecked")
+		final TableViewModel<Object> viewModel = table.getViewModel();
+		final TableData<Object> vmData = viewModel.getData();
+
+		table.setModel(new DefaultTableModel(viewModel.getColumnNames(), 0) {
 
 			private List<Object[]> data = new ArrayList<>();
-			private int columnCount =
-				replacementToArray(new Replacement(null)).length;
+			private int dataColumnCount =
+				viewModel.getArrayFromRowModel(null).length;
 
 			public DefaultTableModel init() {
-				for (Replacement replacement : replacements.getAll()) {
-					Object[] newRow = replacementToArray(replacement);
+				for (Object rowModel : vmData.getAll()) {
+					Object[] newRow = viewModel.getArrayFromRowModel(rowModel);
 					data.add(newRow);
 					visualAddRow(newRow);
 				}
@@ -313,8 +352,8 @@ public class OptionsDialogActions {
 
 			@Override
 			public void insertRow(final int index, final Object[] rowData) {
-				final Replacement r = (Replacement) rowData[0];
-				Object[] newRow = replacementToArray(r);
+				final Object rowModel = rowData[0];
+				Object[] newRow = viewModel.getArrayFromRowModel(rowModel);
 				data.add(index, newRow);
 				visualInsertRow(index, newRow);
 
@@ -327,7 +366,7 @@ public class OptionsDialogActions {
 
 					@Override
 					public void apply() throws Exception {
-						replacements.add(r);
+						vmData.add(rowModel);
 					}
 				});
 			}
@@ -339,19 +378,19 @@ public class OptionsDialogActions {
 
 			@Override
 			public void removeRow(final int row) {
-				final Object[] deletedReplacement = data.remove(row);
+				final Object[] deletedModel = data.remove(row);
 				super.removeRow(row);
 
 				optionModifications.add(new ModificationAction() {
 					@Override
 					public void cancel() throws Exception {
-						data.add(row, deletedReplacement);
-						visualInsertRow(row, deletedReplacement);
+						data.add(row, deletedModel);
+						visualInsertRow(row, deletedModel);
 					}
 
 					@Override
 					public void apply() throws Exception {
-						replacements.remove(row);
+						vmData.remove(row);
 					}
 				});
 			}
@@ -360,7 +399,7 @@ public class OptionsDialogActions {
 			public void setValueAt(final Object val, final int row,
 				final int column) {
 
-				if (column >= columnCount) return;
+				if (column >= dataColumnCount) return;
 
 				final Object previousVal = data.get(row)[column];
 				data.get(row)[column] = val;
@@ -375,47 +414,25 @@ public class OptionsDialogActions {
 
 					@Override
 					public void apply() throws Exception {
-						switch (column) {
-						case 0 : replacements.get(row)
-							.setSequence((String) val);
-						break;
-						case 1 : replacements.get(row)
-							.setReplacement((String) val);
-						break;
-						case 2 : replacements.get(row)
-							.setEscapeCharacters((Boolean) val);
-						break;
-						case 3 : replacements.get(row)
-							.setInterpretAsPattern((Boolean) val);
-						break;
-						case 4 : replacements.setType(
-							replacements.get(row),
-							(ReplacementType) val
-						);
-						break;
-						}
+						viewModel.updateDataFromCoordinates(val, row, column);
 					}
 				});
 			}
 
 			@Override
-		    public Object getValueAt(int row, int col) {
-				return col < columnCount ? data.get(row)[col] : null;
-		    }
+			public Object getValueAt(int row, int col) {
+				return col < dataColumnCount ? data.get(row)[col] : null;
+			}
 
 			@Override
-		    public Class<?> getColumnClass(int col) {
-		        if (col < 2) {
-		            return String.class;
-		        } else if (col == 4) {
-		        	return ReplacementType.class;
-		        }
-		        return Boolean.class;
-		    }
+			public Class<?> getColumnClass(int col) {
+				return viewModel.getColumnClass(col);
+			}
 
 			@Override
 			public boolean isCellEditable(int row, int col) {
-				return col < columnCount;
+				return col < dataColumnCount &&
+					viewModel.isUserEditable(row, col);
 			}
 
 			public void visualAddRow(Object[] content) {
@@ -446,10 +463,10 @@ public class OptionsDialogActions {
 	 * @param columnIndex
 	 * 			The index of the column containing the button.
 	 */
-	public void addReplacementTableUpCellAction(final ReplacementsTable table,
+	public void addTableUpCellAction(final TableViewModelOwner<?> table,
 		final int columnIndex) {
 
-		addReplacementTableReorderCellAction(table, columnIndex, true);
+		addTableReorderCellAction(table, columnIndex, true);
 	}
 
 	/**
@@ -461,14 +478,14 @@ public class OptionsDialogActions {
 	 * @param columnIndex
 	 * 			The index of the column containing the button.
 	 */
-	public void addReplacementTableDownCellAction(final ReplacementsTable table,
+	public void addTableDownCellAction(final TableViewModelOwner<?> table,
 		final int columnIndex) {
 
-		addReplacementTableReorderCellAction(table, columnIndex, false);
+		addTableReorderCellAction(table, columnIndex, false);
 	}
 
-	private void addReplacementTableReorderCellAction(
-		final ReplacementsTable table, final int columnIndex,
+	private void addTableReorderCellAction(
+		final TableViewModelOwner<?> table, final int columnIndex,
 		final boolean up) {
 
 		table.addMouseListener(new MouseAdapter() {
@@ -496,22 +513,86 @@ public class OptionsDialogActions {
 		});
 	}
 
+	/**
+	 * Avoids having more than one active radio button at a time in a table
+	 * column
+	 * @param table
+	 * @param row
+	 * 		Row to set active
+	 * @param col
+	 * 		Column containing the radio button
+	 */
+	public void applyRadioAction(
+		TableViewModelOwner<?> table, int row, int col) {
+
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		for (int i = 0; i < model.getRowCount(); ++i) {
+			model.setValueAt(i == row, i, col);
+		}
+	}
+
+	/**
+	 * Activates radio button handling to a table column
+	 * @param table
+	 * @param columnIndex
+	 */
+	public void addTableRadioAction(
+		final TableViewModelOwner<?> table, final int columnIndex) {
+
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent evt) {
+				int col = table.columnAtPoint(evt.getPoint());
+				int row = table.rowAtPoint(evt.getPoint());
+				if (col == columnIndex) {
+					applyRadioAction(table, row, columnIndex);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Checks if a the values of a table are currently being saved
+	 * @return
+	 */
+	public boolean isModificationsOngoing() {
+		return modificationsOngoing;
+	}
+
+	// FIXME: bad design
+	/**
+	 * Forces the configuration file to be generated from the hex options
+	 * the next time modifications are applied
+	 */
+	public static void setHexOptionsModified () {
+		hexOptionsModified = true;
+	}
+
+	private void setModificationsOngoing(boolean modificationsOngoing) {
+		this.modificationsOngoing = modificationsOngoing;
+		setChanged();
+		notifyObservers();
+	}
+
 	private void applyAllOptionModifications(MainOptions opts) {
+		setModificationsOngoing(true);
 		try {
 			for (ModificationAction modif : optionModifications) {
 				modif.apply();
 			}
 			if (hexOptionsModified) {
-				ccw.updateConfig(opts.getHexOptions());
+				hpc.updateConfig(opts.getHexOptions());
 			}
 			optionModifications.clear();
 			hexOptionsModified = false;
 		} catch (Exception e) {
 			new GUIErrorHandler(e);
 		}
+		setModificationsOngoing(false);
 	}
 
 	private void cancelAllModifications() {
+		setModificationsOngoing(true);
 		try {
 			ListIterator<ModificationAction> iom =
 				new ArrayList<ModificationAction>(optionModifications)
@@ -523,7 +604,9 @@ public class OptionsDialogActions {
 		} catch (Exception e) {
 			new GUIErrorHandler(e);
 		}
+		setModificationsOngoing(false);
 	}
+
 
 	private void closeWindow() {
 		cancelAllModifications();

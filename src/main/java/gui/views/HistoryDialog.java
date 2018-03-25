@@ -1,22 +1,20 @@
 package gui.views;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
 import gui.actions.HistoryDialogActions;
 import gui.utils.Images;
 import gui.views.components.HistoryTable;
+import gui.views.components.TablePanel;
+import hexcapture.HexSelectionsContentSnapshot;
 import hextostring.HexProcessor;
 import hextostring.history.History;
-import main.utils.StringUtils;
 
 /**
  * The dialog containing the history of the lines.
@@ -46,36 +44,20 @@ public class HistoryDialog extends JDialog implements Observer {
 		this.hp = hp;
 		observedHistory.addObserver(this);
 
-		appendBody();
+		historyTable = new HistoryTable();
+		add(new TablePanel(historyTable, getButtons()));
 		setSize(400, 400);
 		setMinimumSize(new Dimension(260, 100));
 	}
 
-	private void appendBody() {
-		JPanel mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add(getTableScrollPane(), BorderLayout.CENTER);
-		mainPanel.add(getButtonsPanel(), BorderLayout.SOUTH);
-		add(mainPanel);
-	}
-
-	private JScrollPane getTableScrollPane() {
-		historyTable = new HistoryTable();
-		JScrollPane scrollPane = new JScrollPane(historyTable);
-		return scrollPane;
-	}
-
-	private JPanel getButtonsPanel() {
-		JPanel buttonsPanel = new JPanel(new BorderLayout());
-
+	private JButton[] getButtons() {
 		JButton setOutputButton = new JButton("Set output as current");
 		acts.setSetOutputButtonAction(setOutputButton);
-		buttonsPanel.add(setOutputButton, BorderLayout.EAST);
 
 		JButton reconvertInputButton = new JButton("Reconvert input");
 		acts.setReconvertInputButtonAction(reconvertInputButton);
-		buttonsPanel.add(reconvertInputButton, BorderLayout.WEST);
 
-		return buttonsPanel;
+		return new JButton[]{setOutputButton, reconvertInputButton};
 	}
 
 	@Override
@@ -83,8 +65,8 @@ public class HistoryDialog extends JDialog implements Observer {
 		History history = (History) o;
 		DefaultTableModel model = (DefaultTableModel) historyTable.getModel();
 		model.addRow(new Object[]{
-			breakTooltipContent(history.getLast().getInput(), 100),
-			breakTooltipContent(history.getLast().getOutput(), 100)
+			history.getLast().getInput(),
+			history.getLast().getOutput()
 		});
 		if (model.getRowCount() > History.HISTORY_MAX_SIZE) {
 			model.removeRow(0);
@@ -99,7 +81,10 @@ public class HistoryDialog extends JDialog implements Observer {
 	 * 			The row containing the input.
 	 */
 	public void reconvertInputAt(int row) {
-		hp.convert(getRowContentAt(row, true), true);
+		hp.convert(
+			(HexSelectionsContentSnapshot) getRowContentAt(row, true),
+			true
+		);
 		int lastRow = historyTable.getRowCount() - 1;
 		setSelectedRow(lastRow);
 		latestDisplayed = lastRow;
@@ -112,7 +97,7 @@ public class HistoryDialog extends JDialog implements Observer {
 	 * 			The row containing the output.
 	 */
 	public void setOutputAsCurrentAt(int row) {
-		mainWindow.setTextAreaContent(getRowContentAt(row, false));
+		mainWindow.setTextAreaContent(getRowContentAt(row, false).toString());
 		setSelectedRow(row);
 		latestDisplayed = row;
 	}
@@ -126,16 +111,8 @@ public class HistoryDialog extends JDialog implements Observer {
 		return latestDisplayed;
 	}
 
-	private String getRowContentAt(int row, boolean input) {
-		return StringUtils.HTMLToPlainText(
-			historyTable.getModel().getValueAt(row, input ? 0 : 1).toString()
-		);
-	}
-
-	private String breakTooltipContent(String content, int maxLineLength) {
-		return StringUtils.plainTextToHTML(
-			StringUtils.breakNoSpaceText(content, maxLineLength)
-		);
+	private Object getRowContentAt(int row, boolean input) {
+		return historyTable.getModel().getValueAt(row, input ? 0 : 1);
 	}
 
 	/**

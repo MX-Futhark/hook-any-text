@@ -41,7 +41,7 @@ public class MainWindow extends JFrame implements Observer {
 	private JTextArea convertedStringsArea = new JTextArea("Welcome to HAT!");
 
 	public MainWindow(HexProcessor hp, MainOptions opts,
-		History observedHistory, boolean seralizationWarning) {
+		History observedHistory, boolean deserializationWarning) {
 
 		super("Hook Any Text");
 		setSize(640, 240);
@@ -69,7 +69,7 @@ public class MainWindow extends JFrame implements Observer {
 		}
 		setVisible(true);
 
-		if (seralizationWarning) {
+		if (deserializationWarning) {
 			JOptionPane.showMessageDialog(
 				this,
 				"You must be using a new version of Hook Any Text. "
@@ -103,14 +103,14 @@ public class MainWindow extends JFrame implements Observer {
 
 		JMenuItem previousLineItem = new JMenuItem("Previous Line");
 		previousLineItem.setAccelerator(KeyStroke.getKeyStroke(
-	        KeyEvent.VK_PAGE_UP, ActionEvent.ALT_MASK
-        ));
+			KeyEvent.VK_PAGE_UP, ActionEvent.ALT_MASK
+		));
 		editMenu.add(previousLineItem);
 
 		JMenuItem nextLineItem = new JMenuItem("Next Line");
 		nextLineItem.setAccelerator(KeyStroke.getKeyStroke(
-	        KeyEvent.VK_PAGE_DOWN, ActionEvent.ALT_MASK
-        ));
+			KeyEvent.VK_PAGE_DOWN, ActionEvent.ALT_MASK
+		));
 		editMenu.add(nextLineItem);
 
 		JMenuItem historyItem = new JMenuItem("History");

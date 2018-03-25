@@ -18,7 +18,7 @@ public class DebuggableDecodingAttemptList implements DebuggableStrings {
 	}
 
 	@Override
-	public DebuggableLineList getValidLineList() {
+	public DebuggableLineList getDecorableList() {
 		for (DebuggableDecodingAttempt attempt : attempts) {
 			if (attempt.isValidEncoding()) {
 				return attempt.getAttempt();

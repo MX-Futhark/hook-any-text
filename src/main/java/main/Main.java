@@ -11,12 +11,16 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 
+import javax.swing.JOptionPane;
+
 import gui.views.MainWindow;
 import hexcapture.HexPipeCompleter;
+import hexcapture.HexSelectionsContentCache;
 import hextostring.HexProcessor;
 import hextostring.history.History;
 import main.options.Options;
 import main.options.annotations.CommandLineArgument;
+import main.utils.ExceptionUtils;
 import main.utils.IOUtils;
 import main.utils.ReflectionUtils;
 
@@ -31,16 +35,16 @@ public class Main {
 		final HexPipeCompleter hpc) {
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
-		    @Override
-		    public void run() {
-		    	try {
-		    		saveOptions(opts);
-		    		hpc.closeHandle();
+			@Override
+			public void run() {
+				try {
+					saveOptions(opts);
+					hpc.closeHandle();
 				} catch (IOException e) {
 					e.printStackTrace();
 					System.exit(1);
 				}
-		    }
+			}
 		});
 	}
 
@@ -134,37 +138,41 @@ public class Main {
 			HexPipeCompleter hpc = new HexPipeCompleter();
 
 			MainOptions opts;
-			boolean serializationWarning = false;
+			boolean deserializationWarning = false;
 			try {
 				opts = restoreOptions();
 
 				try {
-					serializationWarning =
+					deserializationWarning =
 						correctVersionIncompatibilities(opts);
 				} catch (IllegalArgumentException | IllegalAccessException
 					| InstantiationException | SecurityException e) {
 
 					e.printStackTrace();
-					serializationWarning = true;
+					deserializationWarning = true;
 					opts = new MainOptions();
 				}
 
 				opts.parseArgs(args);
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
-				serializationWarning = true;
+				deserializationWarning = true;
 				opts = new MainOptions(args);
+				saveOptions(opts);
 			}
 			attachSerializeOnClose(opts, hpc);
 
 			hpc.updateConfig(opts.getHexOptions());
 
+			HexSelectionsContentCache cache =
+				new HexSelectionsContentCache(opts.getHexOptions());
 			HexProcessor hp =
 				new HexProcessor(opts.getConvertOptions(), history);
 			MainWindow window =
-				new MainWindow(hp, opts, history, serializationWarning);
-			final InputInterpreter ii =
-				new InputInterpreter(opts, System.out, hp, window);
+				new MainWindow(hp, opts, history, deserializationWarning);
+			final InputInterpreter ii = new InputInterpreter(
+				opts, System.out, hp, window, opts.getHexOptions(), cache
+			);
 
 			CompletionService<Boolean> ecs =
 				new ExecutorCompletionService<Boolean>(new Executor() {
@@ -186,6 +194,9 @@ public class Main {
 
 			System.exit(0);
 		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "An unexpected error occured." +
+				" Please take a screenshot of this dialog and contact the " +
+				"maintainer: \n" + ExceptionUtils.getPrintableStackTrace(e));
 			e.printStackTrace();
 			System.exit(1);
 		}

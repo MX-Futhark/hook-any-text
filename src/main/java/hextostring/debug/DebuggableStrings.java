@@ -1,5 +1,7 @@
 package hextostring.debug;
 
+import hextostring.format.DecorableList;
+
 /**
  * Wraps a hexadecimal input and the results of its conversion into an object
  * containing all the necessary information to print debugging messages.
@@ -20,10 +22,10 @@ public interface DebuggableStrings {
 	String toString(long debuggingFlags, int converterStrictness);
 
 	/**
-	 * Provides a list of lines successfully decoded and formatted.
+	 * Provides a list of lines that can be formatted.
 	 *
-	 * @return A list of lines successfully decoded and formatted.
+	 * @return A list of lines that can be formatted.
 	 */
-	DebuggableLineList getValidLineList();
+	DecorableList getDecorableList();
 
 }

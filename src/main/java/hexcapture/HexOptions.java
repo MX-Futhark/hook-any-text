@@ -7,6 +7,8 @@ import main.options.ValueClass;
 import main.options.annotations.CommandLineArgument;
 import main.options.domain.Bounds;
 import main.options.domain.Values;
+import main.options.parser.ArgumentParser;
+import main.options.parser.HexSelectionsParser;
 
 /**
  * Options for the script capturing the hexadecimal selection in Cheat Engine.
@@ -25,6 +27,8 @@ public class HexOptions extends Options implements Serializable {
 	public static final int DEFAULT_HISTORY_SIZE = 6;
 	public static final HexUpdateStrategies DEFAULT_UPDATE_STRATEGY =
 		HexUpdateStrategies.COMBINED;
+	public static final HexSelections DEFAULT_HEX_SELECTIONS =
+		new HexSelections();
 
 	@CommandLineArgument(
 		command = "stabilization",
@@ -65,6 +69,23 @@ public class HexOptions extends Options implements Serializable {
 	public static final
 		Class<? extends ValueClass> UPDATE_STRATEGY_VALUE_CLASS =
 			HexUpdateStrategies.class;
+
+	@CommandLineArgument(
+		command = "selections",
+		description = "Parts of the memory that should be considered for "
+			+ "conversion",
+		usage = "start,end[,active][;start,end[,active];...]"
+			+ " where: \n"
+			+ "  - \"start\" and \"end\" are integers.\n"
+			+ "  - \"active\" is a boolean. If no active selection is provided,"
+			+ " the first one becomes active. If more than one active selection"
+			+ " is provided, the priority goes to the last one.",
+		usageExample = "--selections=\"0,152;256,394,true\""
+	)
+	private HexSelections hexSelections = DEFAULT_HEX_SELECTIONS;
+	public static final
+		Class<? extends ArgumentParser<HexSelections>> HEX_SELECTIONS_PARSER =
+			HexSelectionsParser.class;
 
 	public HexOptions() {
 		super();
@@ -148,6 +169,22 @@ public class HexOptions extends Options implements Serializable {
 		HexUpdateStrategies updateStrategy) {
 
 		this.updateStrategy = updateStrategy;
+	}
+
+	/**
+	 * Getter on the hex selections
+	 * @return
+	 */
+	public synchronized HexSelections getHexSelections() {
+		return hexSelections;
+	}
+
+	/**
+	 * Setter on the hex selections
+	 * @param hexSelections
+	 */
+	public synchronized void setHexSelections(HexSelections hexSelections) {
+		this.hexSelections = hexSelections;
 	}
 
 }

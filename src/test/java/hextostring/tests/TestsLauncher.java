@@ -79,7 +79,7 @@ import main.options.domain.ValueOutOfDomainException;
 public class TestsLauncher {
 
 	private static Formatter formatter =
-		FormatterFactory.getFormatterInstance(true);
+		FormatterFactory.getFormatterInstance(FormatterFactory.TESTS);
 	private static Converter currentConverter;
 	private static IndentablePrintStream out = new IndentablePrintStream();
 
@@ -124,7 +124,7 @@ public class TestsLauncher {
 			);
 
 			DebuggableStrings dInput = currentConverter.convert(input);
-			formatter.format(dInput.getValidLineList());
+			formatter.format(dInput.getDecorableList());
 			String actualOutput = dInput.toString(
 				opts == null
 					? ConvertOptions.DEFAULT_DEBUGGING_FLAGS

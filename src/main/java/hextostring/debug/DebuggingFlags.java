@@ -40,6 +40,10 @@ public class DebuggingFlags implements ValueClass {
 	private static final String LINE_LIST_ENCODING_VALIDITY_DETAILS_CHAR = "r";
 	// e_xcluded encodings
 	private static final String LINE_LIST_ENCODING_REJECTED_CHAR = "x";
+	// hex selections _boundaries
+	private static final String HEX_SELECTIONS_BOUNDS_CHAR = "b";
+	// hex selections _content
+	private static final String HEX_SELECTIONS_CONTENT_CHAR = "c";
 
 
 	@CommandLineValue(
@@ -140,6 +144,18 @@ public class DebuggingFlags implements ValueClass {
 		condition = AUTODETECT_CONDITION
 	)
 	public static final long LINE_LIST_ENCODING_REJECTED = 1 << 12;
+
+	@CommandLineValue(
+		value = HEX_SELECTIONS_BOUNDS_CHAR,
+		description = "Selection bounds"
+	)
+	public static final long HEX_SELECTIONS_BOUNDS = 1 << 13;
+
+	@CommandLineValue(
+		value = HEX_SELECTIONS_CONTENT_CHAR,
+		description = "Hex content of a selection"
+	)
+	public static final long HEX_SELECTIONS_CONTENT = 1 << 14;
 
 	/**
 	 * Gives the command line string values corresponding to an actual long

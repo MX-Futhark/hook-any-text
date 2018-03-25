@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>HookAnyText</groupId>
   <artifactId>HookAnyText</artifactId>
-  <version>0.8.0</version>
+  <version>0.9.0</version>
   <name>HookAnyText</name>
   <description>The goal of this project is to provide an alternative to well established text hookers, whose features are restrained to a certain number of game engines and emulators.</description>
   <properties>

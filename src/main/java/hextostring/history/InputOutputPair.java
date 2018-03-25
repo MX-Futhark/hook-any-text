@@ -1,5 +1,7 @@
 package hextostring.history;
 
+import hexcapture.HexSelectionsContentSnapshot;
+
 /**
  * A pair of strings representing the input and the output of a conversion.
  *
@@ -7,10 +9,10 @@ package hextostring.history;
  */
 public class InputOutputPair {
 
-	private String input;
+	private HexSelectionsContentSnapshot input;
 	private String output;
 
-	public InputOutputPair(String input, String output) {
+	public InputOutputPair(HexSelectionsContentSnapshot input, String output) {
 		super();
 		this.input = input;
 		this.output = output;
@@ -21,7 +23,7 @@ public class InputOutputPair {
 	 *
 	 * @return The input.
 	 */
-	public String getInput() {
+	public HexSelectionsContentSnapshot getInput() {
 		return input;
 	}
 

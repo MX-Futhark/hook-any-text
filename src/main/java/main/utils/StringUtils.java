@@ -100,6 +100,10 @@ public class StringUtils {
 		return wordsToScreamingSnake(camelToWords(name));
 	}
 
+	public static String capitalize(String s) {
+		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
+
 	/**
 	 * Translates HTML into plain text.
 	 *
@@ -166,28 +170,28 @@ public class StringUtils {
 	 * @return The broken text.
 	 */
 	public static String breakText(String txt, int maxLineLength) {
-	    StringTokenizer st = new StringTokenizer(txt, " ");
-	    StringBuilder brokenString = new StringBuilder(txt.length());
-	    int lineLength = 0;
-	    while (st.hasMoreTokens()) {
-	        String word = st.nextToken();
+		StringTokenizer st = new StringTokenizer(txt, " ");
+		StringBuilder brokenString = new StringBuilder(txt.length());
+		int lineLength = 0;
+		while (st.hasMoreTokens()) {
+			String word = st.nextToken();
 
-	        boolean nextLine = lineLength + word.length() > maxLineLength;
-	        if (!nextLine && lineLength > 0) {
-	        	brokenString.append(" ");
-	        }
-	        if (nextLine) {
-	            brokenString.append("\n");
-	            lineLength = 0;
-	        }
-	        brokenString.append(word);
-	        lineLength += word.length() + 1;
-	        if (word.contains("\n")) {
-	        	brokenString.append(" ");
-	        	lineLength = 0;
-	        }
-	    }
-	    return brokenString.toString();
+			boolean nextLine = lineLength + word.length() > maxLineLength;
+			if (!nextLine && lineLength > 0) {
+				brokenString.append(" ");
+			}
+			if (nextLine) {
+				brokenString.append("\n");
+				lineLength = 0;
+			}
+			brokenString.append(word);
+			lineLength += word.length() + 1;
+			if (word.contains("\n")) {
+				brokenString.append(" ");
+				lineLength = 0;
+			}
+		}
+		return brokenString.toString();
 	}
 
 	/**
