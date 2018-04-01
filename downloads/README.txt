@@ -114,6 +114,11 @@
   Changelog
   ---------
 
+  0.9.0 - 2018-04-01
+  - Fixed stabilization threshold spinner
+  - Fixed invisible icon on dark background
+  - Added sticky hex selection and multi hex selections
+
   0.8.0 - 2015-08-15
   - Fixed cmd.exe starting upon opening Cheat Egine
   - Fixed use of deprecated lua functions
