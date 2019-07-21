@@ -295,7 +295,7 @@ local GUI = (function()
 			if Pipe.isActive() then
 				Pipe.focusMainWindow()
 			else
-				CheatEngine.createNativeThread(convertHexSelections)
+				CheatEngine.createNativeThread(startConversionLoop)
 			end
 		end
 		fileMenu.insert(0, hatMenuItem)
@@ -485,8 +485,12 @@ function convertHexSelections()
 			configHasChanged = true
 		end
 
+		if Config.CLOSE_REQUESTED == "restart" then
+			return "continue"
+		end
+
 		if not Pipe.isActive() then
-			break
+			return "exit"
 		end
 
 		if configHasChanged then
@@ -537,10 +541,16 @@ function convertHexSelections()
 
 end
 
+--- Main loop
+function startConversionLoop()
+	while convertHexSelections() == "continue" do
+	end
+end
+
 
 GUI.addHATMenuItem()
 CheatEngine.getMainForm().OnClose = function()
 	pcall(Pipe.close)
 	CheatEngine.closeCE()
 end
-CheatEngine.createNativeThread(convertHexSelections)
+CheatEngine.createNativeThread(startConversionLoop)

@@ -59,10 +59,10 @@ public class HexPipeCompleter {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void closeHandle() throws FileNotFoundException, IOException {
+	public void closeHandle(boolean restart) throws FileNotFoundException, IOException {
 		PrintWriter writer =
 			new PrintWriter(IOUtils.getFileInTempDirectory(FILENAME));
-		writer.println(getKeyValueString(CLOSE_REQUESTED, true));
+		writer.println(getKeyValueString(CLOSE_REQUESTED, restart ? "restart" : "true"));
 		writer.close();
 	}
 

@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ***
 
+## 1.0.0 - 2019-07-21
+- Added profile import/export feature
+
 ## 0.9.0 - 2018-04-01
 - Fixed #13
 - Fixed #14

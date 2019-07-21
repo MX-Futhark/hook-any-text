@@ -31,15 +31,20 @@ import main.utils.ReflectionUtils;
  */
 public class Main {
 
-	private static void attachSerializeOnClose(final MainOptions opts,
-		final HexPipeCompleter hpc) {
+	private static MainOptions opts;
+	private static final HexPipeCompleter hpc = new HexPipeCompleter();
+	private static boolean EXPECT_OPTIONS_REFRESH = false;
+
+	private static void attachSerializeOnClose() {
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				try {
-					saveOptions(opts);
-					hpc.closeHandle();
+					if (!Main.EXPECT_OPTIONS_REFRESH) {
+						saveOptions();
+						hpc.closeHandle(false);
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -48,7 +53,7 @@ public class Main {
 		});
 	}
 
-	private static void saveOptions(MainOptions opts) throws IOException {
+	private static void saveOptions() throws IOException {
 		FileOutputStream fos = new FileOutputStream(
 			IOUtils.getFileInAppdataDirectory(Options.SERIALIAZATION_FILENAME)
 		);
@@ -127,6 +132,26 @@ public class Main {
 	}
 
 	/**
+	 * Serializes the current options to disk.
+	 * @throws IOException
+	 */
+	public static void commitOptions () throws IOException {
+		Main.saveOptions();
+	}
+
+	/**
+	 * Refreshes the UI based on the current options.
+	 * If called without an complete active pipe with selectionConverter.lua,
+	 * the program needs to be restarted manually.
+	 * @throws IOException
+	 */
+	public static void refreshOptions () throws IOException {
+		EXPECT_OPTIONS_REFRESH = true;
+		hpc.closeHandle(true);
+		System.exit(0);
+	}
+
+	/**
 	 * Starts a conversion session and displays the GUI.
 	 *
 	 * @param args
@@ -135,9 +160,7 @@ public class Main {
 	public static void main(String[] args) {
 		try {
 			final History history = new History();
-			HexPipeCompleter hpc = new HexPipeCompleter();
 
-			MainOptions opts;
 			boolean deserializationWarning = false;
 			try {
 				opts = restoreOptions();
@@ -158,9 +181,9 @@ public class Main {
 				e.printStackTrace();
 				deserializationWarning = true;
 				opts = new MainOptions(args);
-				saveOptions(opts);
+				saveOptions();
 			}
-			attachSerializeOnClose(opts, hpc);
+			attachSerializeOnClose();
 
 			hpc.updateConfig(opts.getHexOptions());
 

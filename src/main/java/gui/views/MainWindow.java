@@ -92,8 +92,14 @@ public class MainWindow extends JFrame implements Observer {
 
 	private JMenu getFileMenu() {
 		JMenu fileMenu = new JMenu("File");
+		JMenuItem importItem = new JMenuItem("Import profile");
+		JMenuItem exportItem = new JMenuItem("Export profile");
 		JMenuItem exitItem = new JMenuItem("Exit");
+		acts.setImportItemAction(importItem);
+		acts.setExportItemAction(exportItem);
 		acts.setExitItemAction(exitItem);
+		fileMenu.add(importItem);
+		fileMenu.add(exportItem);
 		fileMenu.add(exitItem);
 		return fileMenu;
 	}

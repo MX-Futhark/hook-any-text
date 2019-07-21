@@ -3,7 +3,7 @@
 -- Write two integers separated by a space to define a selection in this file.
 -- Write "exit" to exit the REPL loop.
 -- Assumes HookAnyText is built in the target directory with the name:
---	  HookAnyTest-someVersionNumber-jar-with-dependencies.jar
+--	  HookAnyText-someVersionNumber-jar-with-dependencies.jar
 
 
 -- helpers
