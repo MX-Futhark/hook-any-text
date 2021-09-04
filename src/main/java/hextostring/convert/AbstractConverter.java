@@ -3,6 +3,7 @@ package hextostring.convert;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import hextostring.ConvertOptions;
 import hextostring.debug.DebuggableLine;
@@ -68,7 +69,7 @@ public abstract class AbstractConverter implements Converter {
 	 */
 	protected static String preProcessHex(String hex) {
 		String lowercaseHex =
-			hex.toLowerCase().replace(" ", "").replace("\n", "");
+			hex.toLowerCase(Locale.ENGLISH).replace(" ", "").replace("\n", "");
 		if (!lowercaseHex.matches("[a-f0-9]+")) {
 			throw new IllegalArgumentException("Invalid hex string.");
 		}

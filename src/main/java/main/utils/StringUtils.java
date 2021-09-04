@@ -1,5 +1,6 @@
 package main.utils;
 
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -50,7 +51,7 @@ public class StringUtils {
 	 * @return "the string"
 	 */
 	public static String screamingSnakeToWords(String name) {
-		return name.replace("_", " ").toLowerCase();
+		return name.replace("_", " ").toLowerCase(Locale.ENGLISH);
 	}
 
 	/**
@@ -60,7 +61,8 @@ public class StringUtils {
 	 * @return "the string"
 	 */
 	public static String camelToWords(String name) {
-		return name.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
+		return name.replaceAll("([a-z])([A-Z])", "$1 $2")
+			.toLowerCase(Locale.ENGLISH);
 	}
 
 	/**
@@ -74,8 +76,7 @@ public class StringUtils {
 		StringBuffer camel = new StringBuffer();
 
 		for (int i = 0; i < splitWords.length; i++) {
-			camel.append(Character.toUpperCase(splitWords[i].charAt(0)))
-				.append(splitWords[i].substring(1));
+			camel.append(StringUtils.capitalize(splitWords[i]));
 		}
 		return camel.toString();
 	}
@@ -87,7 +88,7 @@ public class StringUtils {
 	 * @return THE_STRING
 	 */
 	public static String wordsToScreamingSnake(String words) {
-		return words.replace(" ", "_").toUpperCase();
+		return words.replace(" ", "_").toUpperCase(Locale.ENGLISH);
 	}
 
 	/**
@@ -101,7 +102,7 @@ public class StringUtils {
 	}
 
 	public static String capitalize(String s) {
-		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+		return (s.charAt(0) + "").toUpperCase(Locale.ENGLISH) + s.substring(1);
 	}
 
 	/**

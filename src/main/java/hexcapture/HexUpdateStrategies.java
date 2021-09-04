@@ -1,5 +1,7 @@
 package hexcapture;
 
+import java.util.Locale;
+
 import main.options.ValueClass;
 import main.options.annotations.CommandLineValue;
 
@@ -44,6 +46,6 @@ public enum HexUpdateStrategies implements ValueClass {
 
 	@Override
 	public String toString() {
-		return this.name().toLowerCase();
+		return this.name().toLowerCase(Locale.ENGLISH);
 	}
 }
